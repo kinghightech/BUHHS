@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 // FadeIn component: A wrapper that starts with opacity: 0 and transitions to opacity: 1 
 // after a configurable delay (ms) using a setTimeout + React state.
@@ -83,17 +84,25 @@ export default function App() {
             
             <div className="hidden md:flex items-center gap-8">
               {["Story", "Impact", "Partners", "Contact"].map((item) => (
-                <a 
-                  key={item} 
-                  href="#" 
+                <a
+                  key={item}
+                  href="#"
                   className="text-sm text-white/90 hover:text-gray-300 transition-colors"
                 >
                   {item}
                 </a>
               ))}
+              <Link
+                to="/evacuation"
+                style={{ textDecoration: 'none', background: '#DC2626', color: '#fff', borderRadius: '9999px', padding: '0.35rem 1rem', fontSize: '0.8rem', fontWeight: 700, whiteSpace: 'nowrap', transition: 'background 0.15s' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#b91c1c'}
+                onMouseLeave={e => e.currentTarget.style.background = '#DC2626'}
+              >
+                🚨 Evacuate
+              </Link>
             </div>
 
-            <div className="w-24"></div> {/* Spacer to maintain logo centering if needed, or just leave empty */}
+            <div className="w-24"></div>
           </div>
         </nav>
 

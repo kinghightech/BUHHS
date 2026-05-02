@@ -1,9 +1,8 @@
 import { useState, useCallback, useEffect } from 'react'
 import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet'
+import { Link } from 'react-router-dom'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 
 // ─── Custom marker icons ────────────────────────────────────────────────────
 const makeIcon = (color) =>
@@ -24,9 +23,8 @@ const makeShelterIcon = (color) =>
 
 const greenIcon   = makeIcon('#16A34A')
 const redIcon     = makeIcon('#DC2626')
-const shelterIcon = makeShelterIcon('#00C4FF')
+const shelterIcon = makeShelterIcon('#2563EB')
 
-// ─── Auto-fit map to route bounds ───────────────────────────────────────────
 function FitBounds({ positions }) {
   const map = useMap()
   useEffect(() => {
@@ -38,7 +36,6 @@ function FitBounds({ positions }) {
   return null
 }
 
-// ─── Format helpers ─────────────────────────────────────────────────────────
 function fmtDuration(seconds) {
   const h = Math.floor(seconds / 3600)
   const m = Math.floor((seconds % 3600) / 60)
@@ -68,7 +65,6 @@ function fmtEta(minutes) {
   return `~${minutes}m`
 }
 
-// ─── Shelter helpers ─────────────────────────────────────────────────────────
 const SHELTER_PRIORITY = {
   'Emergency Shelter': 0, 'Community Center': 1, 'Hospital': 2,
   'School': 3, 'College / University': 4, 'Social Services': 5, 'Shelter': 6,
@@ -90,7 +86,6 @@ function shelterEmoji(label) {
   return '🏢'
 }
 
-// ─── Network helpers ─────────────────────────────────────────────────────────
 async function fetchWithTimeout(url, opts = {}, ms = 12000) {
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), ms)
@@ -161,7 +156,7 @@ async function queryNominatim(lat, lon) {
     try {
       const res = await fetchWithTimeout(
         `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5&viewbox=${box}&bounded=1`,
-        { headers: { 'User-Agent': 'Custos-App/1.0' } }, 8000,
+        { headers: { 'User-Agent': 'BUHHS-App/1.0' } }, 8000,
       )
       if (!res.ok) continue
       const data = await res.json()
@@ -178,12 +173,11 @@ async function queryNominatim(lat, lon) {
   return all.sort((a, b) => a.priority !== b.priority ? a.priority - b.priority : a.distMiles - b.distMiles).slice(0, 6)
 }
 
-// ─── Checklist section ───────────────────────────────────────────────────────
-function ChecklistSection({ title, emoji, items, checks, onToggle, color, glass }) {
+function ChecklistSection({ title, emoji, items, checks, onToggle, color }) {
   return (
-    <div style={{ ...glass, flex: '1 1 220px', display: 'flex', flexDirection: 'column', gap: '0.75rem', borderTop: `3px solid ${color}` }}>
-      <h3 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '0.95rem', fontWeight: 800, color: 'var(--ds-text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-        <span>{emoji}</span> {title}
+    <div style={{ flex: '1 1 220px', display: 'flex', flexDirection: 'column', gap: '0.75rem', background: 'rgba(250,252,255,0.92)', backdropFilter: 'blur(12px)', border: '1px solid rgba(99,150,222,0.22)', borderRadius: '1rem', padding: '1.5rem', borderTop: `3px solid ${color}` }}>
+      <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.95rem', fontWeight: 800, color: '#1A3558', margin: 0 }}>
+        {emoji} {title}
       </h3>
       <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {items.map((item, i) => {
@@ -193,7 +187,7 @@ function ChecklistSection({ title, emoji, items, checks, onToggle, color, glass 
               <div style={{ width: 18, height: 18, borderRadius: '0.3rem', flexShrink: 0, marginTop: 1, background: checks[key] ? color : 'transparent', border: `2px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}>
                 {checks[key] && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
               </div>
-              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', color: checks[key] ? 'var(--ds-text-muted)' : 'var(--ds-text-primary)', lineHeight: 1.45, textDecoration: checks[key] ? 'line-through' : 'none', transition: 'color 0.15s' }}>
+              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', color: checks[key] ? '#5B7FA5' : '#1A3558', lineHeight: 1.45, textDecoration: checks[key] ? 'line-through' : 'none', transition: 'color 0.15s' }}>
                 {item}
               </span>
             </li>
@@ -210,122 +204,67 @@ const TIPS = [
   { icon: '⛽', title: 'Full Tank Rule', body: 'Always evacuate with a full tank of gas. Gas stations may close, run out, or have hours-long lines.' },
 ]
 
-// ─── Main Component ──────────────────────────────────────────────────────────
+const N = '#2563EB'
+
+const glass = {
+  background: 'rgba(250, 252, 255, 0.92)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  border: '1px solid rgba(99, 150, 222, 0.22)',
+  borderRadius: '1rem',
+  padding: '1.5rem',
+  boxShadow: '0 4px 20px rgba(37, 99, 235, 0.08)',
+}
+
+const pillBtn = {
+  background: '#1A3558',
+  borderRadius: '9999px',
+  color: '#fff',
+  padding: '0.75rem 1.75rem',
+  border: 'none',
+  cursor: 'pointer',
+  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+  fontWeight: 700,
+  fontSize: '0.9rem',
+  whiteSpace: 'nowrap',
+  boxShadow: '0 4px 14px rgba(26, 53, 88, 0.25)',
+}
+
+const secondaryBtn = {
+  background: 'rgba(37, 99, 235, 0.08)',
+  borderRadius: '9999px',
+  color: N,
+  padding: '0.75rem 1.5rem',
+  border: '1.5px solid rgba(37, 99, 235, 0.25)',
+  cursor: 'pointer',
+  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+  fontWeight: 600,
+  fontSize: '0.9rem',
+  whiteSpace: 'nowrap',
+}
+
+const inputStyle = {
+  width: '100%',
+  background: 'rgba(255, 255, 255, 0.9)',
+  border: '1px solid rgba(99, 150, 222, 0.35)',
+  borderRadius: '0.625rem',
+  padding: '0.7rem 1rem',
+  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+  fontSize: '0.9rem',
+  color: '#1A3558',
+  outline: 'none',
+  boxSizing: 'border-box',
+}
+
+const statCard = {
+  background: 'rgba(37, 99, 235, 0.05)',
+  border: '1px solid rgba(37, 99, 235, 0.14)',
+  borderRadius: '0.75rem',
+  padding: '1rem',
+  textAlign: 'center',
+}
+
 export default function EvacuationPage() {
-  // ── Theme detection ──────────────────────────────────────────────────────
-  const [theme, setTheme] = useState(() =>
-    document.documentElement.getAttribute('data-theme') || 'light'
-  )
-  useEffect(() => {
-    const obs = new MutationObserver(() =>
-      setTheme(document.documentElement.getAttribute('data-theme') || 'light')
-    )
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
-    return () => obs.disconnect()
-  }, [])
-  const isDark = theme === 'dark'
-  const N = '#00C4FF' // neon blue glow color
-
-  // ── Theme-aware style constants ──────────────────────────────────────────
-  const glass = isDark ? {
-    background: 'rgba(3, 14, 38, 0.97)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    border: `1px solid rgba(0, 196, 255, 0.18)`,
-    borderRadius: '1rem',
-    padding: '1.5rem',
-    boxShadow: `0 0 30px rgba(0, 196, 255, 0.06), inset 0 1px 0 rgba(0, 196, 255, 0.09)`,
-    animation: 'neonPulse 4s ease-in-out infinite',
-  } : {
-    background: 'rgba(250,252,255,0.92)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-    border: '1px solid rgba(99,150,222,0.18)',
-    borderRadius: '1rem',
-    padding: '1.5rem',
-  }
-
-  const pillBtn = isDark ? {
-    background: 'linear-gradient(135deg, #003580 0%, #0055CC 100%)',
-    borderRadius: '9999px',
-    color: '#D0F4FF',
-    padding: '0.75rem 1.75rem',
-    border: `1px solid rgba(0, 196, 255, 0.5)`,
-    cursor: 'pointer',
-    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontWeight: 700,
-    fontSize: '0.9rem',
-    whiteSpace: 'nowrap',
-    boxShadow: `0 0 18px rgba(0, 196, 255, 0.35), 0 0 6px rgba(0, 150, 255, 0.4)`,
-    textShadow: `0 0 8px rgba(0, 220, 255, 0.5)`,
-  } : {
-    background: '#0C1A2E',
-    borderRadius: '9999px',
-    color: '#fff',
-    padding: '0.75rem 1.75rem',
-    border: 'none',
-    cursor: 'pointer',
-    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontWeight: 600,
-    fontSize: '0.9rem',
-    whiteSpace: 'nowrap',
-  }
-
-  const secondaryBtn = isDark ? {
-    background: 'rgba(0, 196, 255, 0.07)',
-    borderRadius: '9999px',
-    color: N,
-    padding: '0.75rem 1.5rem',
-    border: `1.5px solid rgba(0, 196, 255, 0.4)`,
-    cursor: 'pointer',
-    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontWeight: 600,
-    fontSize: '0.9rem',
-    whiteSpace: 'nowrap',
-    boxShadow: `0 0 12px rgba(0, 196, 255, 0.2)`,
-  } : {
-    background: 'rgba(37,99,235,0.08)',
-    borderRadius: '9999px',
-    color: '#2563EB',
-    padding: '0.75rem 1.5rem',
-    border: '1.5px solid rgba(37,99,235,0.25)',
-    cursor: 'pointer',
-    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontWeight: 600,
-    fontSize: '0.9rem',
-    whiteSpace: 'nowrap',
-  }
-
-  const inputStyle = isDark ? {
-    width: '100%',
-    background: 'rgba(2, 10, 28, 0.9)',
-    border: `1px solid rgba(0, 196, 255, 0.22)`,
-    borderRadius: '0.625rem',
-    padding: '0.7rem 1rem',
-    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontSize: '0.9rem',
-    color: '#C8EEFF',
-    outline: 'none',
-    boxSizing: 'border-box',
-  } : {
-    width: '100%',
-    background: 'rgba(255,255,255,0.9)',
-    border: '1px solid rgba(99,150,222,0.3)',
-    borderRadius: '0.625rem',
-    padding: '0.7rem 1rem',
-    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontSize: '0.9rem',
-    color: '#1A3558',
-    outline: 'none',
-    boxSizing: 'border-box',
-  }
-
-  const tx1  = isDark ? '#D0EEFF' : '#1A3558'
-  const tx2  = isDark ? '#7BBFDF' : '#3D5A80'
-  const txMt = isDark ? '#4A87A8' : '#5B7FA5'
-  const acct = isDark ? N         : '#2563EB'
-
-  // ── App state ────────────────────────────────────────────────────────────
   const [origin, setOrigin] = useState('')
   const [destination, setDestination] = useState('')
   const [disasterType, setDisasterType] = useState('Hurricane')
@@ -344,7 +283,6 @@ export default function EvacuationPage() {
   const [showShelters, setShowShelters] = useState(true)
   const [preselectedDestCoords, setPreselectedDestCoords] = useState(null)
 
-  // ── Geolocation ──────────────────────────────────────────────────────────
   const handleUseMyLocation = useCallback(() => {
     if (!navigator.geolocation) return
     setGeoLoading(true)
@@ -354,7 +292,7 @@ export default function EvacuationPage() {
         try {
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-            { headers: { 'User-Agent': 'Custos-App/1.0' } },
+            { headers: { 'User-Agent': 'BUHHS-App/1.0' } },
           )
           const data = await res.json()
           setOrigin(
@@ -371,7 +309,7 @@ export default function EvacuationPage() {
   async function geocode(addr) {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(addr)}&format=json&limit=1`,
-      { headers: { 'User-Agent': 'Custos-App/1.0' } },
+      { headers: { 'User-Agent': 'BUHHS-App/1.0' } },
     )
     const data = await res.json()
     if (!data.length) throw new Error(`Could not find "${addr}"`)
@@ -450,8 +388,8 @@ export default function EvacuationPage() {
     try {
       const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://custos-app.vercel.app', 'X-Title': 'Custos Emergency App' },
-        body: JSON.stringify({ model: 'google/gemma-3-27b-it:free', messages: [{ role: 'system', content: 'You are Custos emergency preparedness AI.' }, { role: 'user', content: prompt }] }),
+        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'HTTP-Referer': 'https://buhhs.vercel.app', 'X-Title': 'BUHHS Emergency App' },
+        body: JSON.stringify({ model: 'google/gemma-3-27b-it:free', messages: [{ role: 'system', content: 'You are an emergency preparedness AI.' }, { role: 'user', content: prompt }] }),
       })
       const data = await res.json()
       parseChecklist(data.choices?.[0]?.message?.content || '')
@@ -460,14 +398,12 @@ export default function EvacuationPage() {
   }
 
   function parseChecklist(text) {
-    const extract = s => s.split('\n').map(l => l.replace(/^[-*•]\s*/, '').trim()).filter(l => l.length > 2 && !l.endsWith(':')).slice(0, 5)
     setChecklist({
       must:      (text.match(/MUST HAVE FIRST[:\s]*([\s\S]*?)(?=IMPORTANT ITEMS|$)/i)?.[1] || '').split('\n').map(l=>l.replace(/^[-*•]\s*/,'').trim()).filter(l=>l.length>2&&!l.endsWith(':')).slice(0,5),
       important: (text.match(/IMPORTANT ITEMS[:\s]*([\s\S]*?)(?=DO BEFORE LEAVING|$)/i)?.[1] || '').split('\n').map(l=>l.replace(/^[-*•]\s*/,'').trim()).filter(l=>l.length>2&&!l.endsWith(':')).slice(0,5),
       before:    (text.match(/DO BEFORE LEAVING[:\s]*([\s\S]*?)$/i)?.[1] || '').split('\n').map(l=>l.replace(/^[-*•]\s*/,'').trim()).filter(l=>l.length>2&&!l.endsWith(':')).slice(0,5),
     })
     setChecks({})
-    void extract // silence lint
   }
 
   function toggleCheck(key) { setChecks(p => ({ ...p, [key]: !p[key] })) }
@@ -477,129 +413,93 @@ export default function EvacuationPage() {
     window.open(`https://www.google.com/maps/dir/${encodeURIComponent(origin)}/${encodeURIComponent(destination)}`, '_blank', 'noopener noreferrer')
   }
 
-  const mapCenter = originPos || [39.5, -98.35]
-  const mapZoom = originPos ? 9 : 4
+  const mapCenter = originPos || [42.36, -71.06]
+  const mapZoom = originPos ? 9 : 11
   const hasChecklist = checklist.must.length > 0 || checklist.important.length > 0 || checklist.before.length > 0
   const showShelterPanel = shelterLoading || shelters.length > 0
 
-  // ── Derived dark-mode glow styles ─────────────────────────────────────────
-  const pageBg = isDark
-    ? 'radial-gradient(ellipse at 25% 50%, rgba(0, 80, 200, 0.12) 0%, transparent 55%), radial-gradient(ellipse at 75% 20%, rgba(0, 150, 255, 0.08) 0%, transparent 50%), linear-gradient(160deg, #010912 0%, #020E22 50%, #010912 100%)'
-    : 'var(--ds-bg, #F0F7FF)'
-
-  const heroBg = isDark
-    ? 'radial-gradient(ellipse at 20% 80%, rgba(0, 100, 220, 0.2) 0%, transparent 50%), radial-gradient(ellipse at 80% 10%, rgba(0, 180, 255, 0.12) 0%, transparent 45%), linear-gradient(135deg, #010B1C 0%, #021428 50%, #010B1C 100%)'
-    : 'linear-gradient(135deg, #C8E6FA 0%, #EFF8FF 50%, #DBEAFE 100%)'
-
-  const statCard = isDark ? {
-    background: 'rgba(0, 196, 255, 0.04)',
-    border: `1px solid rgba(0, 196, 255, 0.18)`,
-    borderRadius: '0.75rem',
-    padding: '1rem',
-    textAlign: 'center',
-    boxShadow: `0 0 12px rgba(0, 196, 255, 0.06)`,
-  } : {
-    background: 'rgba(37,99,235,0.05)',
-    border: '1px solid rgba(37,99,235,0.12)',
-    borderRadius: '0.75rem',
-    padding: '1rem',
-    textAlign: 'center',
-  }
-
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: pageBg, transition: 'background 0.4s ease' }}>
-      <Navbar />
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'radial-gradient(ellipse 80% 50% at 15% 10%, rgba(96,165,250,0.15) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 85% 5%, rgba(147,197,253,0.12) 0%, transparent 55%), linear-gradient(160deg, #EFF6FF 0%, #F8FAFF 50%, #EBF4FF 100%)' }}>
 
-      {/* ── Hero ── */}
-      <section style={{ background: heroBg, marginTop: '-5rem', padding: '8rem 1.5rem 4rem', textAlign: 'center', transition: 'background 0.4s ease' }}>
-        <div style={{ maxWidth: '44rem', margin: '0 auto' }}>
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            background: isDark ? 'rgba(0, 196, 255, 0.1)' : 'rgba(37,99,235,0.1)',
-            border: isDark ? `1px solid rgba(0, 196, 255, 0.3)` : '1px solid rgba(37,99,235,0.2)',
-            borderRadius: '9999px', padding: '0.35rem 1rem', marginBottom: '1.25rem',
-            fontSize: '0.78rem', fontWeight: 600, color: acct,
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            boxShadow: isDark ? `0 0 12px rgba(0, 196, 255, 0.2)` : 'none',
-          }}>
+      {/* ── BUHHS Navbar ── */}
+      <nav style={{ padding: '1.25rem 1.5rem 0', position: 'sticky', top: 0, zIndex: 100 }}>
+        <div style={{ maxWidth: '72rem', margin: '0 auto', background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(99,150,222,0.25)', borderRadius: '0.75rem', padding: '0.6rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 4px 20px rgba(37,99,235,0.08)' }}>
+          <Link to="/" style={{ textDecoration: 'none', fontSize: '1.2rem', fontWeight: 700, color: '#1A3558', letterSpacing: '-0.02em', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            BUHHS
+          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', fontWeight: 600, color: '#DC2626', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             🚨 Emergency Evacuation Planner
           </div>
-          <h1 style={{
-            fontFamily: "'Fraunces', Georgia, serif",
-            fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, margin: '0 0 0.75rem',
-            letterSpacing: '-0.025em', lineHeight: 1.15,
-            color: tx1,
-            textShadow: isDark ? `0 0 40px rgba(0, 196, 255, 0.25), 0 0 80px rgba(0, 196, 255, 0.1)` : 'none',
-            animation: isDark ? 'glowText 4s ease-in-out infinite' : 'none',
-          }}>
+          <Link to="/"
+            style={{ textDecoration: 'none', fontSize: '0.8rem', color: '#5B7FA5', fontFamily: "'Plus Jakarta Sans', sans-serif", display: 'flex', alignItems: 'center', gap: '0.3rem', transition: 'color 0.15s' }}
+            onMouseEnter={e => e.currentTarget.style.color = '#1A3558'}
+            onMouseLeave={e => e.currentTarget.style.color = '#5B7FA5'}
+          >
+            ← Back
+          </Link>
+        </div>
+      </nav>
+
+      {/* ── Hero ── */}
+      <section style={{ padding: '3rem 1.5rem 2rem', textAlign: 'center' }}>
+        <div style={{ maxWidth: '44rem', margin: '0 auto' }}>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, margin: '0 0 0.75rem', letterSpacing: '-0.03em', lineHeight: 1.15, color: '#1A3558' }}>
             Evacuation Route Planner
           </h1>
-          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.05rem', color: tx2, margin: 0, lineHeight: 1.7 }}>
-            Plan your emergency evacuation with AI-powered route guidance and personalized checklists
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.05rem', color: '#3D5A80', margin: 0, lineHeight: 1.7 }}>
+            Plan your emergency evacuation with real-time route guidance and personalized checklists
           </p>
         </div>
       </section>
 
-      <main style={{ flex: 1, maxWidth: '72rem', margin: '0 auto', width: '100%', padding: '2.5rem 1.25rem 3rem' }}>
+      <main style={{ flex: 1, maxWidth: '72rem', margin: '0 auto', width: '100%', padding: '0 1.25rem 3rem' }}>
 
         {/* ── Route Input Panel ── */}
         <div style={{ ...glass, marginBottom: '1.5rem' }}>
-          <h2 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '1.15rem', fontWeight: 800, color: tx1, margin: '0 0 1.25rem',
-            textShadow: isDark ? `0 0 20px rgba(0, 196, 255, 0.3)` : 'none' }}>
+          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.15rem', fontWeight: 800, color: '#1A3558', margin: '0 0 1.25rem', textShadow: 'none' }}>
             🗺️ Plan Your Route
           </h2>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
             {/* Origin */}
             <div>
-              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: tx2, marginBottom: '0.375rem' }}>
+              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: '#3D5A80', marginBottom: '0.375rem' }}>
                 🟢 Origin
               </label>
               <input type="text" placeholder="Your current location" value={origin}
                 onChange={e => setOrigin(e.target.value)} onKeyDown={e => e.key === 'Enter' && planRoute()} style={inputStyle} />
               <button type="button" onClick={handleUseMyLocation} disabled={geoLoading}
-                style={{ marginTop: '0.375rem', background: 'none', border: 'none', cursor: 'pointer', color: acct, fontSize: '0.75rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, padding: '0.125rem 0', opacity: geoLoading ? 0.6 : 1 }}>
+                style={{ marginTop: '0.375rem', background: 'none', border: 'none', cursor: 'pointer', color: N, fontSize: '0.75rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, padding: '0.125rem 0', opacity: geoLoading ? 0.6 : 1 }}>
                 {geoLoading ? '⏳ Getting location…' : '📍 Use My Location'}
               </button>
             </div>
 
             {/* Destination */}
             <div>
-              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: tx2, marginBottom: '0.375rem' }}>
+              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: '#3D5A80', marginBottom: '0.375rem' }}>
                 🔴 Destination
               </label>
               <input type="text" placeholder="Safe destination or pick a shelter ↓" value={destination}
                 onChange={e => { setDestination(e.target.value); setPreselectedDestCoords(null) }}
                 onKeyDown={e => e.key === 'Enter' && planRoute()} style={inputStyle} />
 
-              {/* ── Shelter suggestions panel ── */}
               {showShelterPanel && (
-                <div style={{
-                  marginTop: '0.5rem', borderRadius: '0.75rem', overflow: 'hidden',
-                  border: isDark ? `1px solid rgba(0, 196, 255, 0.22)` : '1px solid rgba(37,99,235,0.2)',
-                  background: isDark ? 'rgba(2, 10, 26, 0.98)' : 'rgba(255,255,255,0.97)',
-                  boxShadow: isDark ? `0 0 24px rgba(0, 196, 255, 0.12)` : '0 4px 20px rgba(37,99,235,0.10)',
-                }}>
-                  <div style={{
-                    padding: '0.5rem 0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    background: isDark ? 'rgba(0, 196, 255, 0.06)' : 'rgba(37,99,235,0.06)',
-                    borderBottom: isDark ? `1px solid rgba(0, 196, 255, 0.14)` : '1px solid rgba(37,99,235,0.12)',
-                  }}>
-                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 700, color: isDark ? N : '#3D5A80', display: 'flex', alignItems: 'center', gap: '0.35rem',
-                      textShadow: isDark ? `0 0 8px rgba(0, 196, 255, 0.5)` : 'none' }}>
+                <div style={{ marginTop: '0.5rem', borderRadius: '0.75rem', overflow: 'hidden', border: '1px solid rgba(37,99,235,0.18)', background: 'rgba(255,255,255,0.97)', boxShadow: '0 4px 20px rgba(37,99,235,0.10)' }}>
+                  <div style={{ padding: '0.5rem 0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(37,99,235,0.05)', borderBottom: '1px solid rgba(37,99,235,0.12)' }}>
+                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 700, color: N, textShadow: 'none' }}>
                       🏥 Nearest Shelters — estimated drive time from origin
                     </span>
-                    {shelters.length > 0 && <span style={{ fontSize: '0.65rem', color: txMt, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{shelters.length} found</span>}
+                    {shelters.length > 0 && <span style={{ fontSize: '0.65rem', color: '#5B7FA5', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{shelters.length} found</span>}
                   </div>
 
                   {shelterLoading ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.85rem 1rem' }}>
-                      <div style={{ width: 16, height: 16, flexShrink: 0, border: isDark ? `2px solid rgba(0, 196, 255, 0.2)` : '2px solid rgba(37,99,235,0.2)', borderTop: isDark ? `2px solid ${N}` : '2px solid #2563EB', borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', color: tx2 }}>Searching for nearby emergency shelters…</span>
+                      <div style={{ width: 16, height: 16, flexShrink: 0, border: '2px solid rgba(37,99,235,0.2)', borderTop: `2px solid ${N}`, borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', color: '#3D5A80' }}>Searching for nearby emergency shelters…</span>
                     </div>
                   ) : shelters.length === 0 ? (
                     <div style={{ padding: '0.85rem 1rem' }}>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', color: txMt }}>No tagged shelters found within 100 km — enter a destination manually.</span>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', color: '#5B7FA5' }}>No tagged shelters found within 100 km — enter a destination manually.</span>
                     </div>
                   ) : !showShelters ? null : (
                     shelters.map((s, i) => {
@@ -607,39 +507,24 @@ export default function EvacuationPage() {
                       const isSelected = preselectedDestCoords?.lat === s.lat && preselectedDestCoords?.lon === s.lon
                       return (
                         <button key={i} onClick={() => selectShelter(s)} onDoubleClick={() => { selectShelter(s); setShowShelters(false) }}
-                          style={{
-                            display: 'flex', width: '100%', alignItems: 'center', gap: '0.75rem',
-                            padding: '0.65rem 0.85rem', background: isSelected
-                              ? (isDark ? 'rgba(0, 196, 255, 0.08)' : 'rgba(37,99,235,0.07)') : 'none',
-                            border: 'none',
-                            borderBottom: i < shelters.length - 1 ? `1px solid ${isDark ? 'rgba(0, 196, 255, 0.08)' : 'rgba(99,150,222,0.1)'}` : 'none',
-                            borderLeft: isSelected ? `3px solid ${isDark ? N : '#2563EB'}` : '3px solid transparent',
-                            cursor: 'pointer', textAlign: 'left', transition: 'background 0.12s',
-                          }}
-                          onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = isDark ? 'rgba(0, 196, 255, 0.05)' : 'rgba(37,99,235,0.04)' }}
-                          onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'none' }}
-                        >
-                          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 800, color: txMt, width: '1.1rem', textAlign: 'center', flexShrink: 0 }}>#{i + 1}</span>
+                          style={{ display: 'flex', width: '100%', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.85rem', background: isSelected ? 'rgba(37,99,235,0.07)' : 'none', border: 'none', borderBottom: i < shelters.length - 1 ? '1px solid rgba(37,99,235,0.08)' : 'none', borderLeft: isSelected ? `3px solid ${N}` : '3px solid transparent', cursor: 'pointer', textAlign: 'left' }}>
+                          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 800, color: '#5B7FA5', width: '1.1rem', flexShrink: 0 }}>#{i + 1}</span>
                           <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{emoji}</span>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 600, color: tx1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.name}</div>
-                            <div style={{ fontSize: '0.68rem', color: txMt, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.type}</div>
+                            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 600, color: '#1A3558', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.name}</div>
+                            <div style={{ fontSize: '0.68rem', color: '#5B7FA5', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.type}</div>
                           </div>
                           <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 800, color: isSelected ? acct : tx1,
-                              textShadow: isDark && isSelected ? `0 0 8px rgba(0, 196, 255, 0.6)` : 'none' }}>
-                              {fmtEta(s.etaMin)}
-                            </div>
-                            <div style={{ fontSize: '0.68rem', color: txMt, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.distMiles.toFixed(1)} mi</div>
+                            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 800, color: isSelected ? N : '#1A3558', textShadow: 'none' }}>{fmtEta(s.etaMin)}</div>
+                            <div style={{ fontSize: '0.68rem', color: '#5B7FA5', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.distMiles.toFixed(1)} mi</div>
                           </div>
                         </button>
                       )
                     })
                   )}
-
                   {shelters.length > 0 && (
-                    <div style={{ padding: '0.4rem 0.85rem', background: isDark ? 'rgba(0, 196, 255, 0.03)' : 'rgba(37,99,235,0.03)', borderTop: isDark ? `1px solid rgba(0, 196, 255, 0.08)` : '1px solid rgba(37,99,235,0.08)' }}>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: txMt, fontStyle: 'italic' }}>Times are estimates. Actual drive time shown after routing.</span>
+                    <div style={{ padding: '0.4rem 0.85rem', borderTop: '1px solid rgba(37,99,235,0.08)' }}>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: '#5B7FA5', fontStyle: 'italic' }}>Times are estimates. Actual drive time shown after routing.</span>
                     </div>
                   )}
                 </div>
@@ -648,7 +533,7 @@ export default function EvacuationPage() {
 
             {/* Disaster type */}
             <div>
-              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: tx2, marginBottom: '0.375rem' }}>
+              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: '#3D5A80', marginBottom: '0.375rem' }}>
                 ⚡ Disaster Type
               </label>
               <select value={disasterType} onChange={e => setDisasterType(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
@@ -666,7 +551,7 @@ export default function EvacuationPage() {
             <button onClick={findSheltersNearOrigin} disabled={shelterLoading || geoLoading} style={{ ...secondaryBtn, opacity: (shelterLoading || geoLoading) ? 0.6 : 1 }}>
               {shelterLoading ? '⏳ Searching…' : '🏥 Find Nearby Shelters'}
             </button>
-            {error && <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.825rem', color: '#DC2626', fontWeight: 500 }}>⚠️ {error}</span>}
+            {error && <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.825rem', color: '#ef4444', fontWeight: 500 }}>⚠️ {error}</span>}
           </div>
         </div>
 
@@ -675,21 +560,19 @@ export default function EvacuationPage() {
           <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '55vh', width: '100%', borderRadius: '1rem' }} scrollWheelZoom>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url={isDark
-                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'}
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {routeCoords && (
               <>
                 <FitBounds positions={routeCoords} />
-                <Polyline positions={routeCoords} pathOptions={{ color: isDark ? '#00C4FF' : '#2563EB', weight: 5, opacity: 0.9 }} />
+                <Polyline positions={routeCoords} pathOptions={{ color: '#2563EB', weight: 5, opacity: 0.9 }} />
               </>
             )}
             {originPos && <Marker position={originPos} icon={greenIcon}><Popup><strong>Origin</strong><br />{origin}</Popup></Marker>}
             {destPos && <Marker position={destPos} icon={redIcon}><Popup><strong>Destination</strong><br />{destination}</Popup></Marker>}
             {shelters.map((s, i) => (
               <Marker key={i} position={[s.lat, s.lon]} icon={shelterIcon}>
-                <Popup><strong>{s.name}</strong><br />{s.type}<br /><span style={{ color: isDark ? '#00C4FF' : '#2563EB', fontWeight: 600 }}>{fmtEta(s.etaMin)} · {s.distMiles.toFixed(1)} mi</span></Popup>
+                <Popup><strong>{s.name}</strong><br />{s.type}<br /><span style={{ color: N, fontWeight: 600 }}>{fmtEta(s.etaMin)} · {s.distMiles.toFixed(1)} mi</span></Popup>
               </Marker>
             ))}
           </MapContainer>
@@ -698,8 +581,7 @@ export default function EvacuationPage() {
         {/* ── Route Summary ── */}
         {routeMeta && (
           <div style={{ ...glass, marginBottom: '1.5rem' }}>
-            <h2 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '1.15rem', fontWeight: 800, color: tx1, margin: '0 0 1.25rem',
-              textShadow: isDark ? `0 0 20px rgba(0, 196, 255, 0.3)` : 'none' }}>
+            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.15rem', fontWeight: 800, color: '#1A3558', margin: '0 0 1.25rem', textShadow: 'none' }}>
               📊 Route Summary
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
@@ -711,42 +593,40 @@ export default function EvacuationPage() {
               ].map(item => (
                 <div key={item.label} style={statCard}>
                   <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>{item.icon}</div>
-                  <div style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '1.25rem', fontWeight: 800, color: isDark ? N : '#1A3558', marginBottom: '0.2rem',
-                    textShadow: isDark ? `0 0 12px rgba(0, 196, 255, 0.4)` : 'none' }}>{item.value}</div>
-                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: tx2 }}>{item.label}</div>
+                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.25rem', fontWeight: 800, color: N, marginBottom: '0.2rem', textShadow: 'none' }}>{item.value}</div>
+                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: '#3D5A80' }}>{item.label}</div>
                 </div>
               ))}
             </div>
             <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
               <button onClick={openGoogleMaps} style={pillBtn}>🧭 Start Navigation</button>
-              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', color: tx2 }}>
+              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', color: '#3D5A80' }}>
                 {routeMeta.originDisplay} → {routeMeta.destDisplay}
               </span>
             </div>
           </div>
         )}
 
-        {/* ── AI Packing Checklist ── */}
+        {/* ── AI Checklist ── */}
         {(checklistLoading || hasChecklist) && (
           <div style={{ marginBottom: '1.5rem' }}>
-            <h2 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '1.25rem', fontWeight: 800, color: tx1, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem',
-              textShadow: isDark ? `0 0 20px rgba(0, 196, 255, 0.3)` : 'none' }}>
+            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.25rem', fontWeight: 800, color: '#1A3558', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', textShadow: 'none' }}>
               🤖 AI Evacuation Checklist
-              <span style={{ background: isDark ? 'rgba(124,58,237,0.2)' : 'rgba(124,58,237,0.1)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: '9999px', padding: '0.15rem 0.6rem', fontSize: '0.7rem', color: '#A78BFA', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Gemma 3 27B</span>
+              <span style={{ background: 'rgba(124,58,237,0.2)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: '9999px', padding: '0.15rem 0.6rem', fontSize: '0.7rem', color: '#A78BFA', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Gemma 3 27B</span>
             </h2>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', color: tx2, marginBottom: '1rem' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', color: '#3D5A80', marginBottom: '1rem' }}>
               Personalized for a {disasterType.toLowerCase()} evacuation · Click items to check off
             </p>
             {checklistLoading ? (
               <div style={{ ...glass, display: 'flex', alignItems: 'center', gap: '1rem', justifyContent: 'center', padding: '2rem' }}>
-                <div style={{ width: 28, height: 28, border: isDark ? `3px solid rgba(0, 196, 255, 0.15)` : '3px solid rgba(37,99,235,0.2)', borderTop: isDark ? `3px solid ${N}` : '3px solid #2563EB', borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.9rem', color: tx2 }}>Generating personalized checklist…</span>
+                <div style={{ width: 28, height: 28, border: '3px solid rgba(37,99,235,0.15)', borderTop: `3px solid ${N}`, borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.9rem', color: '#3D5A80' }}>Generating personalized checklist…</span>
               </div>
             ) : (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-                {checklist.must.length > 0 && <ChecklistSection title="Must Have First" emoji="🔴" items={checklist.must} checks={checks} onToggle={toggleCheck} color="#DC2626" glass={glass} />}
-                {checklist.important.length > 0 && <ChecklistSection title="Important Items" emoji="🟡" items={checklist.important} checks={checks} onToggle={toggleCheck} color="#D97706" glass={glass} />}
-                {checklist.before.length > 0 && <ChecklistSection title="Do Before Leaving" emoji="🟢" items={checklist.before} checks={checks} onToggle={toggleCheck} color="#16A34A" glass={glass} />}
+                {checklist.must.length > 0 && <ChecklistSection title="Must Have First" emoji="🔴" items={checklist.must} checks={checks} onToggle={toggleCheck} color="#DC2626" />}
+                {checklist.important.length > 0 && <ChecklistSection title="Important Items" emoji="🟡" items={checklist.important} checks={checks} onToggle={toggleCheck} color="#D97706" />}
+                {checklist.before.length > 0 && <ChecklistSection title="Do Before Leaving" emoji="🟢" items={checklist.before} checks={checks} onToggle={toggleCheck} color="#16A34A" />}
               </div>
             )}
           </div>
@@ -754,35 +634,29 @@ export default function EvacuationPage() {
 
         {/* ── Tips ── */}
         <section>
-          <h2 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '1.25rem', fontWeight: 800, color: tx1, marginBottom: '1rem', textAlign: 'center',
-            textShadow: isDark ? `0 0 20px rgba(0, 196, 255, 0.25)` : 'none' }}>
+          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.25rem', fontWeight: 800, color: '#1A3558', marginBottom: '1rem', textAlign: 'center', textShadow: 'none' }}>
             Essential Evacuation Tips
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
             {TIPS.map(tip => (
               <div key={tip.title} style={{ ...glass, display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
                 <div style={{ fontSize: '2rem' }}>{tip.icon}</div>
-                <h3 style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: '1rem', fontWeight: 800, color: tx1, margin: 0 }}>{tip.title}</h3>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.875rem', color: tx2, lineHeight: 1.6, margin: 0 }}>{tip.body}</p>
+                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1rem', fontWeight: 800, color: '#1A3558', margin: 0 }}>{tip.title}</h3>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.875rem', color: '#3D5A80', lineHeight: 1.6, margin: 0 }}>{tip.body}</p>
               </div>
             ))}
           </div>
         </section>
       </main>
 
-      <Footer />
+      <footer style={{ borderTop: '1px solid rgba(99,150,222,0.2)', padding: '1.5rem', textAlign: 'center' }}>
+        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', color: '#5B7FA5' }}>
+          © 2026 BUHHS · Evacuation data from OpenStreetMap &amp; OSRM · For informational use only
+        </span>
+      </footer>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         @keyframes spin { to { transform: rotate(360deg) } }
-        @keyframes neonPulse {
-          0%, 100% { box-shadow: 0 0 20px rgba(0, 196, 255, 0.06), inset 0 1px 0 rgba(0, 196, 255, 0.08); border-color: rgba(0, 196, 255, 0.18); }
-          50%       { box-shadow: 0 0 35px rgba(0, 196, 255, 0.14), inset 0 1px 0 rgba(0, 196, 255, 0.14); border-color: rgba(0, 196, 255, 0.32); }
-        }
-        @keyframes glowText {
-          0%, 100% { text-shadow: 0 0 30px rgba(0, 196, 255, 0.2), 0 0 60px rgba(0, 196, 255, 0.08); }
-          50%       { text-shadow: 0 0 50px rgba(0, 196, 255, 0.4), 0 0 100px rgba(0, 196, 255, 0.15); }
-        }
         .leaflet-container { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
       `}</style>
     </div>

@@ -1,14 +1,101 @@
 @import "tailwindcss";
 
+/* ── Custos Design Tokens ─────────────────────────────────────── */
+:root {
+  --ds-bg: #EEF5FF;
+  --ds-bg-secondary: #E4EFFE;
+  --ds-surface: #FAFCFF;
+  --ds-surface-secondary: #EFF5FF;
+  --ds-border: rgba(99, 150, 222, 0.18);
+  --ds-border-strong: rgba(99, 150, 222, 0.30);
+  --ds-text-primary: #1A3558;
+  --ds-text-secondary: #3D5A80;
+  --ds-text-muted: #5B7FA5;
+  --ds-text-inverse: #ffffff;
+  --ds-accent: #2563EB;
+  --ds-accent-light: #60A5FA;
+  --ds-accent-hover: #1D4ED8;
+  --ds-accent-dim: rgba(37, 99, 235, 0.09);
+  --ds-gold: #B07010;
+  --ds-gold-light: #F0B840;
+  --ds-positive: #059669;
+  --ds-danger: #DC2626;
+  --ds-warning: #D97706;
+  --ds-info: #2563EB;
+  --ds-shadow-sm: 0 1px 4px rgba(37,99,235,0.07), 0 1px 2px rgba(37,99,235,0.04);
+  --ds-shadow-md: 0 4px 20px rgba(37,99,235,0.10), 0 2px 6px rgba(37,99,235,0.06);
+  --ds-shadow-lg: 0 8px 32px rgba(37,99,235,0.13), 0 4px 10px rgba(37,99,235,0.07);
+  /* backwards-compat aliases */
+  --dg-green-500: var(--ds-accent);
+  --dg-green-600: var(--ds-accent-hover);
+  --dg-green-300: var(--ds-accent-light);
+  --dg-green-400: var(--ds-accent-light);
+  --dg-green-dim: var(--ds-accent-dim);
+  --dg-text-primary: var(--ds-text-primary);
+  --dg-text-secondary: var(--ds-text-secondary);
+  --dg-text-muted: var(--ds-text-muted);
+  --dg-text-inverse: var(--ds-text-inverse);
+  --dg-bg: var(--ds-bg);
+  --dg-card: var(--ds-surface);
+  --dg-card-inner: var(--ds-surface-secondary);
+  --dg-border: var(--ds-border);
+  --dg-border-strong: var(--ds-border-strong);
+  --dg-positive: var(--ds-positive);
+  --dg-danger: var(--ds-danger);
+  --dg-warning: var(--ds-warning);
+  --dg-risk-lo: #10B981;
+  --dg-risk-rlo: #059669;
+  --dg-risk-mod: #D97706;
+  --dg-risk-rhi: #EA580C;
+  --dg-risk-hi: #DC2626;
+}
+
+[data-theme="dark"] {
+  --ds-bg: #0C1526;
+  --ds-bg-secondary: #111E34;
+  --ds-surface: #162038;
+  --ds-surface-secondary: #1C2A48;
+  --ds-border: rgba(99, 150, 222, 0.12);
+  --ds-border-strong: rgba(99, 150, 222, 0.22);
+  --ds-text-primary: #D6E8FF;
+  --ds-text-secondary: #92B8E0;
+  --ds-text-muted: #6088AF;
+  --ds-text-inverse: #1A3558;
+  --ds-accent: #4B96F3;
+  --ds-accent-light: #7CB9FF;
+  --ds-accent-hover: #3680E0;
+  --ds-accent-dim: rgba(75, 150, 243, 0.14);
+  --ds-gold: #E8A830;
+  --ds-gold-light: #F5C860;
+  --ds-positive: #10b981;
+  --ds-danger: #ef4444;
+  --ds-warning: #f59e0b;
+  --ds-info: #4B96F3;
+  --ds-shadow-sm: 0 1px 3px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
+  --ds-shadow-md: 0 4px 16px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.30);
+  --ds-shadow-lg: 0 8px 30px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.35);
+}
+
+/* ── Base ─────────────────────────────────────────────────────── */
 @layer base {
-  body {
-    @apply antialiased;
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: black;
-    color: white;
-    font-family: 'Inter', sans-serif;
   }
+
+  /* VEX landing page resets its own background via bg-black on its root div */
+  body {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--ds-text-primary);
+    line-height: 1.6;
+    transition: background-color 0.25s, color 0.25s;
+  }
+
+  :lang(ar) { font-family: 'Noto Kufi Arabic', system-ui, sans-serif; }
+  :lang(zh) { font-family: 'Noto Sans SC', system-ui, sans-serif; }
+  :lang(hi) { font-family: 'Noto Sans Devanagari', system-ui, sans-serif; }
 }
 
 .liquid-glass {
