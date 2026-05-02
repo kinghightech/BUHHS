@@ -6,6 +6,7 @@ import App from './App'
 import './index.css'
 
 const EvacuationPage = lazy(() => import('./pages/EvacuationPage'))
+const AssessmentPage = lazy(() => import('./pages/AssessmentPage'))
 
 function PageLoader() {
   return (
@@ -23,6 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/evacuation" element={<Suspense fallback={<PageLoader />}><EvacuationPage /></Suspense>} />
+          <Route path="/assessment" element={<Suspense fallback={<PageLoader />}><AssessmentPage /></Suspense>} />
         </Routes>
       </LanguageProvider>
     </BrowserRouter>

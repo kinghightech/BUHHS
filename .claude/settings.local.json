@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"import\\('./src/components/Charts.jsx'\\).catch\\(e => console.log\\(e.message\\)\\)\")"
+    ]
+  }
+}
