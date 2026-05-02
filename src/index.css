@@ -51,29 +51,34 @@
 }
 
 [data-theme="dark"] {
-  --ds-bg: #0C1526;
-  --ds-bg-secondary: #111E34;
-  --ds-surface: #162038;
-  --ds-surface-secondary: #1C2A48;
-  --ds-border: rgba(99, 150, 222, 0.12);
-  --ds-border-strong: rgba(99, 150, 222, 0.22);
-  --ds-text-primary: #D6E8FF;
-  --ds-text-secondary: #92B8E0;
-  --ds-text-muted: #6088AF;
-  --ds-text-inverse: #1A3558;
-  --ds-accent: #4B96F3;
-  --ds-accent-light: #7CB9FF;
-  --ds-accent-hover: #3680E0;
-  --ds-accent-dim: rgba(75, 150, 243, 0.14);
-  --ds-gold: #E8A830;
-  --ds-gold-light: #F5C860;
-  --ds-positive: #10b981;
-  --ds-danger: #ef4444;
-  --ds-warning: #f59e0b;
-  --ds-info: #4B96F3;
-  --ds-shadow-sm: 0 1px 3px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
-  --ds-shadow-md: 0 4px 16px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.30);
-  --ds-shadow-lg: 0 8px 30px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.35);
+  /* Richer base — slightly lifted from pure black, blue-tinted */
+  --ds-bg: #060d1c;
+  --ds-bg-secondary: #0d1b34;
+  --ds-surface: #1A2540;
+  --ds-surface-secondary: #22324E;
+  /* Blue-tinted borders so cards read as glass, not grey paper */
+  --ds-border: rgba(140, 180, 230, 0.14);
+  --ds-border-strong: rgba(140, 180, 230, 0.34);
+  /* Brighter, cooler text */
+  --ds-text-primary: #F1F6FC;
+  --ds-text-secondary: rgba(220, 232, 250, 0.82);
+  --ds-text-muted: rgba(176, 196, 224, 0.62);
+  --ds-text-inverse: #0C1A2E;
+  /* Brighter accent for that "luminous in the dark" feel */
+  --ds-accent: #8AC2FF;
+  --ds-accent-light: #B6D7FF;
+  --ds-accent-hover: #5FA9F8;
+  --ds-accent-dim: rgba(138, 194, 255, 0.16);
+  --ds-gold: #F5C860;
+  --ds-gold-light: #FBE8B0;
+  --ds-positive: #34D399;
+  --ds-danger: #FB7185;
+  --ds-warning: #FBBF24;
+  --ds-info: #8AC2FF;
+  /* Layered shadows: deep base + tight contact + subtle inner highlight */
+  --ds-shadow-sm: 0 2px 6px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.04);
+  --ds-shadow-md: 0 8px 24px rgba(0,0,0,0.50), 0 2px 6px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+  --ds-shadow-lg: 0 20px 50px rgba(0,0,0,0.60), 0 6px 16px rgba(0,0,0,0.40), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
 /* ── Base ─────────────────────────────────────────────────────── */

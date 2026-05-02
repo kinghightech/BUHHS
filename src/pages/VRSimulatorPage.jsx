@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
+import HavenShell, { useHavenPalette } from '../components/HavenShell'
 import Icon from '../components/Icon'
 
 // ─── Scenario data ──────────────────────────────────────────────────────────
@@ -830,6 +829,7 @@ const SCENARIOS = [
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export default function VRSimulatorPage() {
+  const palette = useHavenPalette()
   const [selected, setSelected] = useState(null)
   const [stepIndex, setStepIndex] = useState(0)
   const [scores, setScores] = useState([])
@@ -898,27 +898,36 @@ export default function VRSimulatorPage() {
   const gradeColor = totalScore >= 90 ? '#10b981' : totalScore >= 75 ? '#3b82f6' : totalScore >= 55 ? '#f59e0b' : '#ef4444'
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--ds-bg)' }}>
-      <Navbar />
-
+    <HavenShell palette={palette} backTo="/situation" current="🎮 Awareness Quizzes">
       {/* ── Scenario Select ── */}
       {phase === 'select' && (
         <>
-          <section style={{ background: 'linear-gradient(180deg, #4E96D1 0%, #6CB8EA 38%, #A8D9F5 72%, #D0ECFA 100%)', marginTop: '-5rem', padding: '9rem 1.5rem 4rem', textAlign: 'center' }}>
-            <div style={{ maxWidth: '44rem', margin: '0 auto' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(78,150,209,0.18)', border: '1px solid rgba(78,150,209,0.35)', borderRadius: '2rem', padding: '0.35rem 1rem', marginBottom: '1.25rem', fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.95)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                <Icon name="sparkles" size={14} /> AWARENESS QUIZ
-              </div>
-              <h1 style={{ fontSize: '2.8rem', fontWeight: 900, color: '#fff', margin: '0 0 0.75rem', letterSpacing: '-0.02em', fontFamily: "'Fraunces', Georgia, serif" }}>
-                Disaster Awareness Quiz
-              </h1>
-              <p style={{ fontSize: '1.1rem', fontWeight: 600, color: 'rgba(255,255,255,0.92)', margin: '0 0 1.25rem' }}>
-                Test Your Knowledge of Life-Saving Decisions
-              </p>
-              <p style={{ fontSize: '0.95rem', color: 'rgba(255,255,255,0.78)', lineHeight: 1.7, maxWidth: '36rem', margin: '0 auto' }}>
-                Choose a disaster scenario below to test your emergency preparedness knowledge. Answer 10 questions per scenario, learn the reasoning behind each choice, and discover how your decisions affect safety and financial outcomes.
-              </p>
+          <section style={{ padding: '3rem 1.5rem 1.5rem', textAlign: 'center', maxWidth: '52rem', margin: '0 auto', width: '100%' }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+              background: palette.isDark ? 'rgba(124,185,255,0.12)' : 'rgba(37,99,235,0.08)',
+              border: `1px solid ${palette.borderStrong}`,
+              borderRadius: '2rem', padding: '0.35rem 1rem', marginBottom: '1.25rem',
+              fontSize: '0.72rem', fontWeight: 800,
+              color: palette.accent, letterSpacing: '0.18em', textTransform: 'uppercase',
+            }}>
+              <Icon name="sparkles" size={14} /> AWARENESS QUIZZES
             </div>
+            <h1 style={{
+              fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 300,
+              color: palette.text, margin: '0 0 0.75rem',
+              letterSpacing: '-0.025em', lineHeight: 1.1,
+              fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+            }}>
+              Train for the moment it matters.
+            </h1>
+            <p style={{
+              fontSize: '1.05rem', fontWeight: 500, color: palette.textDim,
+              margin: '0 0 1rem', maxWidth: '36rem', marginLeft: 'auto', marginRight: 'auto',
+              lineHeight: 1.6, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+            }}>
+              Pick a disaster. Answer 10 split-second decisions. See your preparedness grade and the financial reality behind each scenario.
+            </p>
           </section>
 
           <section style={{ padding: '3rem 1.5rem', maxWidth: '72rem', margin: '0 auto', width: '100%' }}>
@@ -928,25 +937,26 @@ export default function VRSimulatorPage() {
                   key={s.id}
                   onClick={() => startScenario(s)}
                   style={{
-                    background: 'rgba(250,252,255,0.92)',
-                    border: '1px solid rgba(99,150,222,0.22)',
+                    background: palette.surface,
+                    border: `1px solid ${palette.border}`,
                     borderRadius: '1.25rem',
-                    padding: '2rem 1.5rem',
+                    padding: '1.85rem 1.5rem',
                     textAlign: 'left',
                     cursor: 'pointer',
                     transition: 'border-color 0.15s, box-shadow 0.15s, transform 0.15s',
-                    boxShadow: '0 4px 24px rgba(99,150,222,0.10)',
+                    boxShadow: palette.shadow,
                     backdropFilter: 'blur(8px)',
+                    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = s.color; e.currentTarget.style.boxShadow = `0 4px 20px ${s.color}25`; e.currentTarget.style.transform = 'translateY(-2px)' }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(99,150,222,0.22)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(99,150,222,0.10)'; e.currentTarget.style.transform = 'translateY(0)' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = s.color; e.currentTarget.style.boxShadow = `0 12px 30px ${s.color}40`; e.currentTarget.style.transform = 'translateY(-3px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = palette.border; e.currentTarget.style.boxShadow = palette.shadow; e.currentTarget.style.transform = 'translateY(0)' }}
                 >
-                  <div style={{ width: '3rem', height: '3rem', borderRadius: '0.75rem', background: `${s.color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+                  <div style={{ width: '3rem', height: '3rem', borderRadius: '0.75rem', background: `${s.color}26`, border: `1px solid ${s.color}55`, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
                     <Icon name={s.icon} size={24} style={{ color: s.color }} />
                   </div>
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#1A3558', margin: '0 0 0.35rem', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>{s.name}</h3>
-                  <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#3D5A80', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>10 Questions</div>
-                  <p style={{ fontSize: '0.85rem', color: '#3D5A80', lineHeight: 1.6, margin: '0 0 1rem' }}>{s.desc}</p>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: palette.text, margin: '0 0 0.3rem', letterSpacing: '-0.01em' }}>{s.name}</h3>
+                  <div style={{ fontSize: '0.66rem', fontWeight: 800, color: palette.textMuted, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.10em' }}>10 Questions</div>
+                  <p style={{ fontSize: '0.85rem', color: palette.textDim, lineHeight: 1.6, margin: '0 0 1rem' }}>{s.desc}</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', fontWeight: 700, color: s.color }}>
                     Start Quiz <Icon name="arrowRight" size={14} />
                   </div>
@@ -957,17 +967,32 @@ export default function VRSimulatorPage() {
 
           {/* How it works */}
           <section style={{ padding: '0 1.5rem 3.5rem', maxWidth: '64rem', margin: '0 auto', width: '100%' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1A3558', textAlign: 'center', marginBottom: '1.5rem', fontFamily: "'Fraunces', Georgia, serif" }}>How It Works</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
+            <h2 style={{
+              fontSize: '1.4rem', fontWeight: 700, color: palette.text,
+              textAlign: 'center', marginBottom: '1.5rem',
+              fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+              letterSpacing: '-0.02em',
+            }}>How it works</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
               {[
-                { step: '1', title: 'Choose a Disaster', desc: 'Select from 8 disaster types — each with 10 scenario-based questions.' },
-                { step: '2', title: 'Answer Questions', desc: 'Face realistic emergency situations and choose the best response under pressure.' },
-                { step: '3', title: 'Get Your Grade', desc: 'Receive a preparedness grade with financial insights and expert safety tips.' },
+                { step: '1', title: 'Choose a disaster', desc: 'Pick from 9 scenarios — each with 10 questions.' },
+                { step: '2', title: 'Make split-second calls', desc: 'Real situations. Real consequences. No second chances during a quake.' },
+                { step: '3', title: 'Get your grade', desc: 'Preparedness score plus the financial reality of each scenario.' },
               ].map(h => (
-                <div key={h.step} style={{ background: 'rgba(250,252,255,0.92)', border: '1px solid rgba(99,150,222,0.22)', borderRadius: '1.25rem', padding: '1.75rem', textAlign: 'center', backdropFilter: 'blur(8px)', boxShadow: '0 4px 24px rgba(99,150,222,0.08)' }}>
-                  <div style={{ width: '2.5rem', height: '2.5rem', borderRadius: '50%', background: '#0C1A2E', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.1rem', margin: '0 auto 0.75rem' }}>{h.step}</div>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1A3558', margin: '0 0 0.4rem', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>{h.title}</h3>
-                  <p style={{ fontSize: '0.8rem', color: '#3D5A80', lineHeight: 1.5, margin: 0 }}>{h.desc}</p>
+                <div key={h.step} style={{
+                  background: palette.surface, border: `1px solid ${palette.border}`,
+                  borderRadius: '1rem', padding: '1.4rem', textAlign: 'center',
+                  backdropFilter: 'blur(8px)', boxShadow: palette.shadow,
+                  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                }}>
+                  <div style={{
+                    width: '2.4rem', height: '2.4rem', borderRadius: '50%',
+                    background: palette.accent, color: '#fff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: 900, fontSize: '1rem', margin: '0 auto 0.75rem',
+                  }}>{h.step}</div>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: palette.text, margin: '0 0 0.4rem' }}>{h.title}</h3>
+                  <p style={{ fontSize: '0.8rem', color: palette.textDim, lineHeight: 1.5, margin: 0 }}>{h.desc}</p>
                 </div>
               ))}
             </div>
@@ -1220,8 +1245,6 @@ export default function VRSimulatorPage() {
         </div>
       )}
 
-      {phase === 'select' && <Footer />}
-
       <style>{`
         @keyframes simFadeIn {
           from { opacity: 0; transform: translateY(10px); }
@@ -1232,6 +1255,6 @@ export default function VRSimulatorPage() {
           50% { transform: scale(1.15); }
         }
       `}</style>
-    </div>
+    </HavenShell>
   )
 }

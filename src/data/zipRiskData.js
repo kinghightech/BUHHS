@@ -474,6 +474,134 @@ export const ZIP_RISK_DATA = {
       { code: 'DRGT', name: 'Drought',         icon: 'sun', pct:  3, rating: 'Very Low' },
     ],
   },
+
+  // ── Boston, MA — Beacon Hill ─────────────────────────────────────────
+  '02108': {
+    zip: '02108', city: 'Beacon Hill', state: 'MA', countyName: 'Suffolk County, MA',
+    lat: 42.3588, lng: -71.0707, riskRating: 'Relatively Moderate', neighborhood: 'Beacon Hill',
+    hazards: [
+      { code: 'WNTW', name: 'Winter Weather', icon: 'snowflake', pct: 26, rating: 'Relatively High' },
+      { code: 'HWAV', name: 'Heat Wave',       icon: 'thermometer', pct: 20, rating: 'Relatively High' },
+      { code: 'CFLD', name: 'Coastal Flooding', icon: 'waves', pct: 18, rating: 'Relatively High' },
+      { code: 'RFLD', name: 'Flooding',         icon: 'waves', pct: 14, rating: 'Relatively Moderate' },
+      { code: 'HRCN', name: 'Hurricane',        icon: 'hurricane', pct: 10, rating: 'Relatively Moderate' },
+      { code: 'LTNG', name: 'Lightning',        icon: 'zap', pct:  6, rating: 'Relatively Low' },
+      { code: 'TRND', name: 'Tornado',          icon: 'tornado', pct:  4, rating: 'Very Low' },
+      { code: 'ERQK', name: 'Earthquake',       icon: 'mountain', pct:  2, rating: 'Very Low' },
+    ],
+  },
+
+  // ── Boston, MA — Chinatown / South Cove (HOTTEST NEIGHBORHOOD) ──────
+  '02111': {
+    zip: '02111', city: 'Chinatown', state: 'MA', countyName: 'Suffolk County, MA',
+    lat: 42.3505, lng: -71.0621, riskRating: 'Relatively High', neighborhood: 'Chinatown',
+    hazards: [
+      { code: 'HWAV', name: 'Heat Wave',       icon: 'thermometer', pct: 38, rating: 'Very High' },
+      { code: 'CFLD', name: 'Coastal Flooding', icon: 'waves', pct: 17, rating: 'Relatively High' },
+      { code: 'RFLD', name: 'Flooding',         icon: 'waves', pct: 14, rating: 'Relatively High' },
+      { code: 'WNTW', name: 'Winter Weather',   icon: 'snowflake', pct: 12, rating: 'Relatively Moderate' },
+      { code: 'HRCN', name: 'Hurricane',        icon: 'hurricane', pct:  9, rating: 'Relatively Moderate' },
+      { code: 'LTNG', name: 'Lightning',        icon: 'zap', pct:  5, rating: 'Relatively Low' },
+      { code: 'TRND', name: 'Tornado',          icon: 'tornado', pct:  3, rating: 'Very Low' },
+      { code: 'ERQK', name: 'Earthquake',       icon: 'mountain', pct:  2, rating: 'Very Low' },
+    ],
+  },
+
+  // ── Boston, MA — South End / Roxbury border ─────────────────────────
+  '02118': {
+    zip: '02118', city: 'South End', state: 'MA', countyName: 'Suffolk County, MA',
+    lat: 42.3389, lng: -71.0759, riskRating: 'Relatively High', neighborhood: 'South End',
+    hazards: [
+      { code: 'HWAV', name: 'Heat Wave',       icon: 'thermometer', pct: 32, rating: 'Very High' },
+      { code: 'CFLD', name: 'Coastal Flooding', icon: 'waves', pct: 17, rating: 'Relatively High' },
+      { code: 'WNTW', name: 'Winter Weather',   icon: 'snowflake', pct: 16, rating: 'Relatively High' },
+      { code: 'RFLD', name: 'Flooding',         icon: 'waves', pct: 13, rating: 'Relatively Moderate' },
+      { code: 'HRCN', name: 'Hurricane',        icon: 'hurricane', pct: 10, rating: 'Relatively Moderate' },
+      { code: 'LTNG', name: 'Lightning',        icon: 'zap', pct:  6, rating: 'Relatively Low' },
+      { code: 'TRND', name: 'Tornado',          icon: 'tornado', pct:  4, rating: 'Very Low' },
+      { code: 'ERQK', name: 'Earthquake',       icon: 'mountain', pct:  2, rating: 'Very Low' },
+    ],
+  },
+
+  // ── Boston, MA — Roxbury (highway-adjacent, asthma) ─────────────────
+  '02119': {
+    zip: '02119', city: 'Roxbury', state: 'MA', countyName: 'Suffolk County, MA',
+    lat: 42.3231, lng: -71.0850, riskRating: 'Relatively High', neighborhood: 'Roxbury',
+    hazards: [
+      { code: 'HWAV', name: 'Heat Wave',       icon: 'thermometer', pct: 35, rating: 'Very High' },
+      { code: 'WNTW', name: 'Winter Weather',   icon: 'snowflake', pct: 19, rating: 'Relatively High' },
+      { code: 'RFLD', name: 'Flooding',         icon: 'waves', pct: 15, rating: 'Relatively High' },
+      { code: 'HRCN', name: 'Hurricane',        icon: 'hurricane', pct: 11, rating: 'Relatively Moderate' },
+      { code: 'CFLD', name: 'Coastal Flooding', icon: 'waves', pct:  9, rating: 'Relatively Moderate' },
+      { code: 'LTNG', name: 'Lightning',        icon: 'zap', pct:  6, rating: 'Relatively Low' },
+      { code: 'TRND', name: 'Tornado',          icon: 'tornado', pct:  3, rating: 'Very Low' },
+      { code: 'ERQK', name: 'Earthquake',       icon: 'mountain', pct:  2, rating: 'Very Low' },
+    ],
+  },
+
+  // ── Boston, MA — Dorchester (energy-burdened housing stock) ─────────
+  '02125': {
+    zip: '02125', city: 'Dorchester', state: 'MA', countyName: 'Suffolk County, MA',
+    lat: 42.3145, lng: -71.0582, riskRating: 'Relatively High', neighborhood: 'Dorchester',
+    hazards: [
+      { code: 'HWAV', name: 'Heat Wave',       icon: 'thermometer', pct: 28, rating: 'Relatively High' },
+      { code: 'CFLD', name: 'Coastal Flooding', icon: 'waves', pct: 23, rating: 'Very High' },
+      { code: 'WNTW', name: 'Winter Weather',   icon: 'snowflake', pct: 18, rating: 'Relatively High' },
+      { code: 'RFLD', name: 'Flooding',         icon: 'waves', pct: 13, rating: 'Relatively Moderate' },
+      { code: 'HRCN', name: 'Hurricane',        icon: 'hurricane', pct: 10, rating: 'Relatively Moderate' },
+      { code: 'LTNG', name: 'Lightning',        icon: 'zap', pct:  4, rating: 'Relatively Low' },
+      { code: 'TRND', name: 'Tornado',          icon: 'tornado', pct:  2, rating: 'Very Low' },
+      { code: 'ERQK', name: 'Earthquake',       icon: 'mountain', pct:  2, rating: 'Very Low' },
+    ],
+  },
+
+  // ── Boston, MA — East Boston (FLOODS FIRST + Logan AQI) ─────────────
+  '02128': {
+    zip: '02128', city: 'East Boston', state: 'MA', countyName: 'Suffolk County, MA',
+    lat: 42.3702, lng: -71.0367, riskRating: 'Very High', neighborhood: 'East Boston',
+    hazards: [
+      { code: 'CFLD', name: 'Coastal Flooding', icon: 'waves', pct: 32, rating: 'Very High' },
+      { code: 'HWAV', name: 'Heat Wave',       icon: 'thermometer', pct: 22, rating: 'Relatively High' },
+      { code: 'RFLD', name: 'Flooding',         icon: 'waves', pct: 17, rating: 'Relatively High' },
+      { code: 'HRCN', name: 'Hurricane',        icon: 'hurricane', pct: 13, rating: 'Relatively High' },
+      { code: 'WNTW', name: 'Winter Weather',   icon: 'snowflake', pct:  9, rating: 'Relatively Moderate' },
+      { code: 'LTNG', name: 'Lightning',        icon: 'zap', pct:  4, rating: 'Relatively Low' },
+      { code: 'TRND', name: 'Tornado',          icon: 'tornado', pct:  2, rating: 'Very Low' },
+      { code: 'ERQK', name: 'Earthquake',       icon: 'mountain', pct:  1, rating: 'Very Low' },
+    ],
+  },
+
+  // ── Boston, MA — Jamaica Plain ───────────────────────────────────────
+  '02130': {
+    zip: '02130', city: 'Jamaica Plain', state: 'MA', countyName: 'Suffolk County, MA',
+    lat: 42.3097, lng: -71.1151, riskRating: 'Relatively Moderate', neighborhood: 'Jamaica Plain',
+    hazards: [
+      { code: 'HWAV', name: 'Heat Wave',       icon: 'thermometer', pct: 26, rating: 'Relatively High' },
+      { code: 'WNTW', name: 'Winter Weather',   icon: 'snowflake', pct: 22, rating: 'Relatively High' },
+      { code: 'RFLD', name: 'Flooding',         icon: 'waves', pct: 17, rating: 'Relatively Moderate' },
+      { code: 'HRCN', name: 'Hurricane',        icon: 'hurricane', pct: 12, rating: 'Relatively Moderate' },
+      { code: 'CFLD', name: 'Coastal Flooding', icon: 'waves', pct:  9, rating: 'Relatively Moderate' },
+      { code: 'LTNG', name: 'Lightning',        icon: 'zap', pct:  7, rating: 'Relatively Low' },
+      { code: 'TRND', name: 'Tornado',          icon: 'tornado', pct:  4, rating: 'Very Low' },
+      { code: 'ERQK', name: 'Earthquake',       icon: 'mountain', pct:  3, rating: 'Very Low' },
+    ],
+  },
+
+  // ── Boston, MA — Mattapan (lowest tree canopy) ──────────────────────
+  '02126': {
+    zip: '02126', city: 'Mattapan', state: 'MA', countyName: 'Suffolk County, MA',
+    lat: 42.2675, lng: -71.0918, riskRating: 'Relatively High', neighborhood: 'Mattapan',
+    hazards: [
+      { code: 'HWAV', name: 'Heat Wave',       icon: 'thermometer', pct: 36, rating: 'Very High' },
+      { code: 'WNTW', name: 'Winter Weather',   icon: 'snowflake', pct: 18, rating: 'Relatively High' },
+      { code: 'RFLD', name: 'Flooding',         icon: 'waves', pct: 14, rating: 'Relatively Moderate' },
+      { code: 'HRCN', name: 'Hurricane',        icon: 'hurricane', pct: 11, rating: 'Relatively Moderate' },
+      { code: 'CFLD', name: 'Coastal Flooding', icon: 'waves', pct:  9, rating: 'Relatively Moderate' },
+      { code: 'LTNG', name: 'Lightning',        icon: 'zap', pct:  6, rating: 'Relatively Low' },
+      { code: 'TRND', name: 'Tornado',          icon: 'tornado', pct:  4, rating: 'Very Low' },
+      { code: 'ERQK', name: 'Earthquake',       icon: 'mountain', pct:  2, rating: 'Very Low' },
+    ],
+  },
 }
 
 /**

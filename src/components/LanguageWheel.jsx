@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { LANGUAGES } from '../i18n/LanguageContext'
-import ShieldLogo from './ShieldLogo'
+import HavenLogo from './HavenLogo'
 
 const N = LANGUAGES.length
 
@@ -252,7 +252,7 @@ export default function LanguageWheel({ currentLang, onSelect, onClose }) {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             pointerEvents: 'none', zIndex: 4,
           }}>
-            <ShieldLogo size={30} />
+            <HavenLogo size={32} color="#1D4ED8" />
           </div>
         </div>
 

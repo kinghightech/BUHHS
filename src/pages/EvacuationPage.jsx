@@ -88,6 +88,29 @@ function shelterEmoji(label) {
   return '🏢'
 }
 
+// ─── Boston Cooling Center / Shelter fallbacks ─────────────────────────────
+const BOSTON_FALLBACK_SHELTERS = [
+  { name: 'Boston Public Library — Copley Square',     type: 'Cooling Center', lat: 42.3493, lon: -71.0780 },
+  { name: 'Madison Park Library (BPL)',                type: 'Cooling Center', lat: 42.3334, lon: -71.0891 },
+  { name: 'Mattapan Branch — Boston Public Library',   type: 'Cooling Center', lat: 42.2683, lon: -71.0925 },
+  { name: 'BCYF Quincy Community Center',              type: 'Community Center', lat: 42.3489, lon: -71.0610 },
+  { name: 'BCYF Vine Street (Roxbury)',                type: 'Community Center', lat: 42.3296, lon: -71.0820 },
+  { name: 'BCYF Curtis Hall (Jamaica Plain)',          type: 'Community Center', lat: 42.3157, lon: -71.1039 },
+  { name: 'BCYF Paris Street (East Boston)',           type: 'Community Center', lat: 42.3691, lon: -71.0383 },
+  { name: 'BCYF Mildred Avenue (Mattapan)',            type: 'Community Center', lat: 42.2751, lon: -71.0813 },
+]
+
+function bostonFallbackShelters(originLat, originLon) {
+  return BOSTON_FALLBACK_SHELTERS
+    .map(s => {
+      const dist = haversineMiles(originLat, originLon, s.lat, s.lon)
+      return { ...s, distMiles: dist, etaMin: roughEtaMin(dist), priority: 0 }
+    })
+    .filter(s => s.distMiles < 25)
+    .sort((a, b) => a.distMiles - b.distMiles)
+    .slice(0, 6)
+}
+
 async function fetchWithTimeout(url, opts = {}, ms = 12000) {
   const ctrl = new AbortController()
   const timer = setTimeout(() => ctrl.abort(), ms)
@@ -201,9 +224,9 @@ function ChecklistSection({ title, emoji, items, checks, onToggle, color, isDark
 }
 
 const TIPS = [
-  { icon: '🚗', title: 'Leave Early', body: "Don't wait for a mandatory order. Voluntary evacuation avoids gridlock and gives you time to secure your home." },
-  { icon: '📱', title: 'Emergency Contacts', body: 'Save local emergency management numbers before you lose signal. Download offline maps for your route.' },
-  { icon: '⛽', title: 'Full Tank Rule', body: 'Always evacuate with a full tank of gas. Gas stations may close, run out, or have hours-long lines.' },
+  { icon: '🚗', title: 'Leave Early', body: "Plan ahead. Leaving early avoids gridlock, gives you time to secure your home, and lowers stress on the road." },
+  { icon: '📱', title: 'Save Key Contacts', body: 'Save 211 (Mass resource line), your destination shelter, and 1-2 trusted contacts. Download offline maps before you go.' },
+  { icon: '⛽', title: 'Full Tank Rule', body: 'Travel with a full tank. Gas stations along the route may have long lines or be closed when traffic surges.' },
 ]
 
 export default function EvacuationPage() {
@@ -260,7 +283,6 @@ export default function EvacuationPage() {
   const txMt = isDark ? '#4A87A8' : '#5B7FA5'
   const [origin, setOrigin] = useState('')
   const [destination, setDestination] = useState('')
-  const [disasterType, setDisasterType] = useState('Hurricane')
   const [routeCoords, setRouteCoords] = useState(null)
   const [originPos, setOriginPos] = useState(null)
   const [destPos, setDestPos] = useState(null)
@@ -315,6 +337,16 @@ export default function EvacuationPage() {
     try {
       let results = await queryOverpass(lat, lon)
       if (results.length === 0) results = await queryNominatim(lat, lon)
+      // Boston fallback: if APIs returned <3 results AND we're in the Boston area, use hardcoded list
+      if (results.length < 3 && lat > 42.20 && lat < 42.45 && lon > -71.20 && lon < -70.95) {
+        const fb = bostonFallbackShelters(lat, lon)
+        const seen = new Set(results.map(r => `${r.lat.toFixed(3)},${r.lon.toFixed(3)}`))
+        for (const s of fb) {
+          const k = `${s.lat.toFixed(3)},${s.lon.toFixed(3)}`
+          if (!seen.has(k)) { results.push(s); seen.add(k) }
+          if (results.length >= 6) break
+        }
+      }
       setShelters(results)
       setShowShelters(true)
     } finally {
@@ -367,17 +399,17 @@ export default function EvacuationPage() {
         originDisplay: originGeo.display.split(',')[0],
         destDisplay: (destGeo.display || destination).split(',')[0],
       })
-      fetchChecklist(origin, destination, fmtMiles(route.distance), fmtDuration(route.duration), disasterType)
+      fetchChecklist(origin, destination, fmtMiles(route.distance), fmtDuration(route.duration))
     } catch (err) {
       setError(err.message || 'Routing failed. Please try again.')
     } finally { setLoading(false) }
   }
 
-  async function fetchChecklist(orig, dest, distMi, dur, type) {
+  async function fetchChecklist(orig, dest, distMi, dur) {
     const key = import.meta.env.VITE_OPENROUTER_API_KEY
     if (!key) return
     setChecklistLoading(true)
-    const prompt = `I'm evacuating from ${orig} to ${dest} (${distMi} miles, ${dur}). Disaster type: ${type}.\nGive me a prioritized evacuation checklist in exactly 3 categories with exactly 5 items each:\n(1) Must Have First\n(2) Important Items\n(3) Do Before Leaving\nFormat EXACTLY as:\nMUST HAVE FIRST:\n- item\n...\nIMPORTANT ITEMS:\n- item\n...\nDO BEFORE LEAVING:\n- item\n...`
+    const prompt = `I'm leaving from ${orig} heading to ${dest} (${distMi} miles, ${dur}).\nGive me a prioritized travel + relocation checklist in exactly 3 categories with exactly 5 items each:\n(1) Must Have First\n(2) Important Items\n(3) Do Before Leaving\nFormat EXACTLY as:\nMUST HAVE FIRST:\n- item\n...\nIMPORTANT ITEMS:\n- item\n...\nDO BEFORE LEAVING:\n- item\n...`
     try {
       const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
@@ -463,12 +495,18 @@ export default function EvacuationPage() {
               <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: tx2, marginBottom: '0.375rem' }}>
                 🟢 Origin
               </label>
-              <input type="text" placeholder="Your current location" value={origin}
+              <input type="text" placeholder="e.g. 1 City Hall Square Boston MA" value={origin}
                 onChange={e => setOrigin(e.target.value)} onKeyDown={e => e.key === 'Enter' && planRoute()} style={inputStyle} />
-              <button type="button" onClick={handleUseMyLocation} disabled={geoLoading}
-                style={{ marginTop: '0.375rem', background: 'none', border: 'none', cursor: 'pointer', color: N, fontSize: '0.75rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, padding: '0.125rem 0', opacity: geoLoading ? 0.6 : 1 }}>
-                {geoLoading ? '⏳ Getting location…' : '📍 Use My Location'}
-              </button>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.4rem', alignItems: 'center' }}>
+                <button type="button" onClick={handleUseMyLocation} disabled={geoLoading}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: N, fontSize: '0.75rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, padding: '0.125rem 0', opacity: geoLoading ? 0.6 : 1 }}>
+                  {geoLoading ? '⏳ Getting location…' : '📍 Use My Location'}
+                </button>
+                <button type="button" onClick={() => setOrigin('1 City Hall Square Boston MA')}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: txMt, fontSize: '0.72rem', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, padding: '0.125rem 0' }}>
+                  · Try City Hall
+                </button>
+              </div>
             </div>
 
             {/* Destination */}
@@ -528,17 +566,6 @@ export default function EvacuationPage() {
               )}
             </div>
 
-            {/* Disaster type */}
-            <div>
-              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: tx2, marginBottom: '0.375rem' }}>
-                ⚡ Disaster Type
-              </label>
-              <select value={disasterType} onChange={e => setDisasterType(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
-                {['Hurricane', 'Wildfire', 'Flood', 'Earthquake', 'Winter Storm', 'General Emergency'].map(t => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
@@ -586,7 +613,7 @@ export default function EvacuationPage() {
                 { icon: '⏱️', label: 'Estimated Time', value: fmtDuration(routeMeta.duration) },
                 { icon: '📏', label: 'Distance', value: `${fmtMiles(routeMeta.distance)} mi` },
                 { icon: '🔄', label: 'Turn-by-Turn Steps', value: `${routeMeta.steps} steps` },
-                { icon: '⚡', label: 'Disaster Type', value: disasterType },
+                { icon: '🏥', label: 'Shelters Found', value: `${shelters.length}` },
               ].map(item => (
                 <div key={item.label} style={statCard}>
                   <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>{item.icon}</div>
@@ -608,11 +635,11 @@ export default function EvacuationPage() {
         {(checklistLoading || hasChecklist) && (
           <div style={{ marginBottom: '1.5rem' }}>
             <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.25rem', fontWeight: 800, color: tx1, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', textShadow: 'none' }}>
-              🤖 AI Evacuation Checklist
+              🤖 AI Packing Checklist
               <span style={{ background: 'rgba(124,58,237,0.2)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: '9999px', padding: '0.15rem 0.6rem', fontSize: '0.7rem', color: '#A78BFA', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Gemma 3 27B</span>
             </h2>
             <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', color: tx2, marginBottom: '1rem' }}>
-              Personalized for a {disasterType.toLowerCase()} evacuation · Click items to check off
+              Personalized for your route · Click items to check off
             </p>
             {checklistLoading ? (
               <div style={{ ...glass, display: 'flex', alignItems: 'center', gap: '1rem', justifyContent: 'center', padding: '2rem' }}>
