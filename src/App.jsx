@@ -31,16 +31,14 @@ const AnimatedHeading = ({ text, initialDelay = 200, charDelay = 30 }) => {
     return () => clearTimeout(timer);
   }, [initialDelay]);
 
-  let globalCharIndex = 0;
-
   return (
-    <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal mb-4" style={{ letterSpacing: '-0.04em' }}>
+    <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal mb-8 text-center" style={{ letterSpacing: '-0.04em' }}>
       {lines.map((line, lineIndex) => {
         const lineChars = line.split('');
-        const lineResult = (
+        return (
           <div key={lineIndex} className="block overflow-hidden">
             {lineChars.map((char, charIndex) => {
-              const delay = (lineIndex * line.length * charDelay) + (charIndex * charDelay);
+              const delay = (lineIndex * 20 * charDelay) + (charIndex * charDelay);
               const displayChar = char === ' ' ? '\u00A0' : char;
               
               const style = {
@@ -48,7 +46,7 @@ const AnimatedHeading = ({ text, initialDelay = 200, charDelay = 30 }) => {
                 transition: `opacity 500ms ease-out, transform 500ms ease-out`,
                 transitionDelay: `${delay}ms`,
                 opacity: isAnimating ? 1 : 0,
-                transform: isAnimating ? 'translateX(0)' : 'translateX(-18px)',
+                transform: isAnimating ? 'translateY(0)' : 'translateY(20px)',
               };
 
               return (
@@ -59,7 +57,6 @@ const AnimatedHeading = ({ text, initialDelay = 200, charDelay = 30 }) => {
             })}
           </div>
         );
-        return lineResult;
       })}
     </h1>
   );
@@ -72,9 +69,9 @@ const AuthScreen = ({ onBack }) => {
     <div className="min-h-screen flex items-center justify-center relative z-10 px-6">
       <div className="liquid-glass border border-white/20 p-8 rounded-2xl w-full max-w-md">
         <div className="mb-8">
-          <div className="text-2xl font-semibold tracking-tight mb-2">VEX</div>
+          <div className="text-2xl font-semibold tracking-tight mb-2">BUHHS</div>
           <h2 className="text-3xl font-normal mb-2">{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
-          <p className="text-gray-400">{isLogin ? 'Enter your details to access your account' : 'Join the VEX community'}</p>
+          <p className="text-gray-400">{isLogin ? 'Enter your details to access your account' : 'Join the BUHHS community'}</p>
         </div>
         
         <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
@@ -155,10 +152,10 @@ export default function App() {
           {/* Navbar */}
           <nav className="px-6 md:px-12 lg:px-16 pt-6">
             <div className="liquid-glass rounded-xl px-4 py-2 flex items-center justify-between">
-              <div className="text-2xl font-semibold tracking-tight cursor-pointer">VEX</div>
+              <div className="text-2xl font-semibold tracking-tight cursor-pointer">BUHHS</div>
               
               <div className="hidden md:flex items-center gap-8">
-                {["Story", "Investing", "Building", "Advisory"].map((item) => (
+                {["Story", "Impact", "Partners", "Contact"].map((item) => (
                   <a 
                     key={item} 
                     href="#" 
@@ -173,47 +170,30 @@ export default function App() {
                 onClick={() => setShowAuth(true)}
                 className="bg-white text-black px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
               >
-                Start a Chat
+                Sign In
               </button>
             </div>
           </nav>
 
-          {/* Hero Content */}
-          <main className="flex-1 flex flex-col justify-end px-6 md:px-12 lg:px-16 pb-12 lg:pb-16">
-            <div className="lg:grid lg:grid-cols-2 lg:items-end">
-              {/* Left Column */}
-              <div className="mb-12 lg:mb-0">
-                <AnimatedHeading text={"Shaping tomorrow\nwith vision and action."} />
-                
-                <FadeIn delay={800} duration={1000}>
-                  <p className="text-base md:text-lg text-gray-300 mb-8 max-w-lg">
-                    We back visionaries and craft ventures that define what comes next.
-                  </p>
-                </FadeIn>
-
-                <FadeIn delay={1200} duration={1000} className="flex flex-wrap gap-4">
-                  <button 
-                    onClick={() => setShowAuth(true)}
-                    className="bg-white text-black px-8 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors"
-                  >
-                    Start a Chat
-                  </button>
-                  <button className="liquid-glass border border-white/20 text-white px-8 py-3 rounded-lg font-medium hover:bg-white hover:text-black transition-all duration-300">
-                    Explore Now
-                  </button>
-                </FadeIn>
-              </div>
-
-              {/* Right Column */}
-              <div className="flex items-end justify-start lg:justify-end">
-                <FadeIn delay={1400} duration={1000}>
-                  <div className="liquid-glass border border-white/20 px-6 py-3 rounded-xl">
-                    <span className="text-lg md:text-xl lg:text-2xl font-light tracking-wide">
-                      Investing. Building. Advisory.
-                    </span>
-                  </div>
-                </FadeIn>
-              </div>
+          {/* Hero Content - Centered */}
+          <main className="flex-1 flex flex-col items-center justify-center px-6 md:px-12 lg:px-16 pb-12">
+            <div className="max-w-4xl flex flex-col items-center">
+              <AnimatedHeading text={"Ready to transform your life,\none at a time until Boston\nis a better place?"} />
+              
+              <FadeIn delay={1200} duration={1000} className="flex flex-wrap gap-6 justify-center mt-4">
+                <button 
+                  onClick={() => setShowAuth(true)}
+                  className="bg-white text-black px-10 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 scale-105 hover:scale-110 active:scale-95"
+                >
+                  I have a home
+                </button>
+                <button 
+                  onClick={() => setShowAuth(true)}
+                  className="bg-red-600 text-white px-10 py-4 rounded-lg font-semibold hover:bg-red-700 transition-all duration-300 scale-105 hover:scale-110 active:scale-95 shadow-lg shadow-red-600/20"
+                >
+                  I need help
+                </button>
+              </FadeIn>
             </div>
           </main>
         </div>
