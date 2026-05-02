@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-
 import { Link } from 'react-router-dom'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import ThemeToggle, { useTheme } from '../components/ThemeToggle'
+import LanguagePopup from '../components/LanguagePopup'
 
 // ─── Custom marker icons ────────────────────────────────────────────────────
 const makeIcon = (color) =>
@@ -173,10 +175,10 @@ async function queryNominatim(lat, lon) {
   return all.sort((a, b) => a.priority !== b.priority ? a.priority - b.priority : a.distMiles - b.distMiles).slice(0, 6)
 }
 
-function ChecklistSection({ title, emoji, items, checks, onToggle, color }) {
+function ChecklistSection({ title, emoji, items, checks, onToggle, color, isDark }) {
   return (
-    <div style={{ flex: '1 1 220px', display: 'flex', flexDirection: 'column', gap: '0.75rem', background: 'rgba(250,252,255,0.92)', backdropFilter: 'blur(12px)', border: '1px solid rgba(99,150,222,0.22)', borderRadius: '1rem', padding: '1.5rem', borderTop: `3px solid ${color}` }}>
-      <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.95rem', fontWeight: 800, color: '#1A3558', margin: 0 }}>
+    <div style={{ flex: '1 1 220px', display: 'flex', flexDirection: 'column', gap: '0.75rem', background: isDark ? 'rgba(3,14,38,0.97)' : 'rgba(250,252,255,0.92)', backdropFilter: 'blur(12px)', border: isDark ? '1px solid rgba(0,196,255,0.18)' : '1px solid rgba(99,150,222,0.22)', borderRadius: '1rem', padding: '1.5rem', borderTop: `3px solid ${color}` }}>
+      <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.95rem', fontWeight: 800, color: isDark ? '#D0EEFF' : '#1A3558', margin: 0 }}>
         {emoji} {title}
       </h3>
       <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -187,7 +189,7 @@ function ChecklistSection({ title, emoji, items, checks, onToggle, color }) {
               <div style={{ width: 18, height: 18, borderRadius: '0.3rem', flexShrink: 0, marginTop: 1, background: checks[key] ? color : 'transparent', border: `2px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}>
                 {checks[key] && <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1.5 5L4 7.5L8.5 2.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
               </div>
-              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', color: checks[key] ? '#5B7FA5' : '#1A3558', lineHeight: 1.45, textDecoration: checks[key] ? 'line-through' : 'none', transition: 'color 0.15s' }}>
+              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', color: checks[key] ? '#5B7FA5' : (isDark ? '#D0EEFF' : '#1A3558'), lineHeight: 1.45, textDecoration: checks[key] ? 'line-through' : 'none', transition: 'color 0.15s' }}>
                 {item}
               </span>
             </li>
@@ -204,67 +206,58 @@ const TIPS = [
   { icon: '⛽', title: 'Full Tank Rule', body: 'Always evacuate with a full tank of gas. Gas stations may close, run out, or have hours-long lines.' },
 ]
 
-const N = '#2563EB'
-
-const glass = {
-  background: 'rgba(250, 252, 255, 0.92)',
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
-  border: '1px solid rgba(99, 150, 222, 0.22)',
-  borderRadius: '1rem',
-  padding: '1.5rem',
-  boxShadow: '0 4px 20px rgba(37, 99, 235, 0.08)',
-}
-
-const pillBtn = {
-  background: '#1A3558',
-  borderRadius: '9999px',
-  color: '#fff',
-  padding: '0.75rem 1.75rem',
-  border: 'none',
-  cursor: 'pointer',
-  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-  fontWeight: 700,
-  fontSize: '0.9rem',
-  whiteSpace: 'nowrap',
-  boxShadow: '0 4px 14px rgba(26, 53, 88, 0.25)',
-}
-
-const secondaryBtn = {
-  background: 'rgba(37, 99, 235, 0.08)',
-  borderRadius: '9999px',
-  color: N,
-  padding: '0.75rem 1.5rem',
-  border: '1.5px solid rgba(37, 99, 235, 0.25)',
-  cursor: 'pointer',
-  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-  fontWeight: 600,
-  fontSize: '0.9rem',
-  whiteSpace: 'nowrap',
-}
-
-const inputStyle = {
-  width: '100%',
-  background: 'rgba(255, 255, 255, 0.9)',
-  border: '1px solid rgba(99, 150, 222, 0.35)',
-  borderRadius: '0.625rem',
-  padding: '0.7rem 1rem',
-  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-  fontSize: '0.9rem',
-  color: '#1A3558',
-  outline: 'none',
-  boxSizing: 'border-box',
-}
-
-const statCard = {
-  background: 'rgba(37, 99, 235, 0.05)',
-  border: '1px solid rgba(37, 99, 235, 0.14)',
-  borderRadius: '0.75rem',
-  padding: '1rem',
-  textAlign: 'center',
-}
-
 export default function EvacuationPage() {
+  const { theme, toggle } = useTheme()
+  const isDark = theme === 'dark'
+
+  const N = isDark ? '#00C4FF' : '#2563EB'
+
+  const glass = isDark ? {
+    background: 'rgba(3,14,38,0.97)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(0,196,255,0.18)', borderRadius: '1rem', padding: '1.5rem',
+    boxShadow: '0 0 30px rgba(0,196,255,0.06)',
+  } : {
+    background: 'rgba(250,252,255,0.92)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(99,150,222,0.22)', borderRadius: '1rem', padding: '1.5rem',
+    boxShadow: '0 4px 20px rgba(37,99,235,0.08)',
+  }
+
+  const pillBtn = isDark ? {
+    background: 'linear-gradient(135deg,#003580 0%,#0055CC 100%)', borderRadius: '9999px',
+    color: '#D0F4FF', padding: '0.75rem 1.75rem', border: '1px solid rgba(0,196,255,0.5)',
+    cursor: 'pointer', fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", fontWeight: 700, fontSize: '0.9rem', whiteSpace: 'nowrap',
+  } : {
+    background: '#1A3558', borderRadius: '9999px', color: '#fff',
+    padding: '0.75rem 1.75rem', border: 'none', cursor: 'pointer',
+    fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", fontWeight: 700, fontSize: '0.9rem', whiteSpace: 'nowrap',
+    boxShadow: '0 4px 14px rgba(26,53,88,0.25)',
+  }
+
+  const secondaryBtn = {
+    background: isDark ? 'rgba(0,196,255,0.07)' : 'rgba(37,99,235,0.08)',
+    borderRadius: '9999px', color: N, padding: '0.75rem 1.5rem',
+    border: isDark ? '1.5px solid rgba(0,196,255,0.4)' : '1.5px solid rgba(37,99,235,0.25)',
+    cursor: 'pointer', fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", fontWeight: 600, fontSize: '0.9rem', whiteSpace: 'nowrap',
+  }
+
+  const inputStyle = {
+    width: '100%',
+    background: isDark ? 'rgba(2,10,28,0.9)' : 'rgba(255,255,255,0.9)',
+    border: isDark ? '1px solid rgba(0,196,255,0.22)' : '1px solid rgba(99,150,222,0.35)',
+    borderRadius: '0.625rem', padding: '0.7rem 1rem',
+    fontFamily: "'Plus Jakarta Sans',system-ui,sans-serif", fontSize: '0.9rem',
+    color: isDark ? '#C8EEFF' : '#1A3558', outline: 'none', boxSizing: 'border-box',
+  }
+
+  const statCard = {
+    background: isDark ? 'rgba(0,196,255,0.04)' : 'rgba(37,99,235,0.05)',
+    border: isDark ? '1px solid rgba(0,196,255,0.18)' : '1px solid rgba(37,99,235,0.14)',
+    borderRadius: '0.75rem', padding: '1rem', textAlign: 'center',
+  }
+
+  const tx1  = isDark ? '#D0EEFF' : '#1A3558'
+  const tx2  = isDark ? '#7BBFDF' : '#3D5A80'
+  const txMt = isDark ? '#4A87A8' : '#5B7FA5'
   const [origin, setOrigin] = useState('')
   const [destination, setDestination] = useState('')
   const [disasterType, setDisasterType] = useState('Hurricane')
@@ -419,34 +412,38 @@ export default function EvacuationPage() {
   const showShelterPanel = shelterLoading || shelters.length > 0
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'radial-gradient(ellipse 80% 50% at 15% 10%, rgba(96,165,250,0.15) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 85% 5%, rgba(147,197,253,0.12) 0%, transparent 55%), linear-gradient(160deg, #EFF6FF 0%, #F8FAFF 50%, #EBF4FF 100%)' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', transition: 'background 0.3s', background: isDark ? 'radial-gradient(ellipse at 25% 50%,rgba(0,80,200,0.12) 0%,transparent 55%),linear-gradient(160deg,#010912 0%,#020E22 50%,#010912 100%)' : 'radial-gradient(ellipse 80% 50% at 15% 10%,rgba(96,165,250,0.15) 0%,transparent 60%),linear-gradient(160deg,#EFF6FF 0%,#F8FAFF 50%,#EBF4FF 100%)' }}>
 
       {/* ── BUHHS Navbar ── */}
       <nav style={{ padding: '1.25rem 1.5rem 0', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ maxWidth: '72rem', margin: '0 auto', background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(99,150,222,0.25)', borderRadius: '0.75rem', padding: '0.6rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 4px 20px rgba(37,99,235,0.08)' }}>
-          <Link to="/" style={{ textDecoration: 'none', fontSize: '1.2rem', fontWeight: 700, color: '#1A3558', letterSpacing: '-0.02em', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <div style={{ maxWidth: '72rem', margin: '0 auto', background: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.75)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(99,150,222,0.25)', borderRadius: '0.75rem', padding: '0.6rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+          <Link to="/" style={{ textDecoration: 'none', fontSize: '1.2rem', fontWeight: 700, color: tx1, letterSpacing: '-0.02em', fontFamily: "'Plus Jakarta Sans', sans-serif", flexShrink: 0 }}>
             BUHHS
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.78rem', fontWeight: 600, color: '#DC2626', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             🚨 Emergency Evacuation Planner
           </div>
-          <Link to="/"
-            style={{ textDecoration: 'none', fontSize: '0.8rem', color: '#5B7FA5', fontFamily: "'Plus Jakarta Sans', sans-serif", display: 'flex', alignItems: 'center', gap: '0.3rem', transition: 'color 0.15s' }}
-            onMouseEnter={e => e.currentTarget.style.color = '#1A3558'}
-            onMouseLeave={e => e.currentTarget.style.color = '#5B7FA5'}
-          >
-            ← Back
-          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: 'auto' }}>
+            <ThemeToggle theme={theme} onToggle={toggle} />
+            <LanguagePopup />
+            <Link to="/"
+              style={{ textDecoration: 'none', fontSize: '0.8rem', color: txMt, fontFamily: "'Plus Jakarta Sans', sans-serif", display: 'flex', alignItems: 'center', gap: '0.3rem', transition: 'color 0.15s' }}
+              onMouseEnter={e => e.currentTarget.style.color = tx1}
+              onMouseLeave={e => e.currentTarget.style.color = txMt}
+            >
+              ← Back
+            </Link>
+          </div>
         </div>
       </nav>
 
       {/* ── Hero ── */}
       <section style={{ padding: '3rem 1.5rem 2rem', textAlign: 'center' }}>
         <div style={{ maxWidth: '44rem', margin: '0 auto' }}>
-          <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, margin: '0 0 0.75rem', letterSpacing: '-0.03em', lineHeight: 1.15, color: '#1A3558' }}>
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 900, margin: '0 0 0.75rem', letterSpacing: '-0.03em', lineHeight: 1.15, color: tx1 }}>
             Evacuation Route Planner
           </h1>
-          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.05rem', color: '#3D5A80', margin: 0, lineHeight: 1.7 }}>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.05rem', color: tx2, margin: 0, lineHeight: 1.7 }}>
             Plan your emergency evacuation with real-time route guidance and personalized checklists
           </p>
         </div>
@@ -456,14 +453,14 @@ export default function EvacuationPage() {
 
         {/* ── Route Input Panel ── */}
         <div style={{ ...glass, marginBottom: '1.5rem' }}>
-          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.15rem', fontWeight: 800, color: '#1A3558', margin: '0 0 1.25rem', textShadow: 'none' }}>
+          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.15rem', fontWeight: 800, color: tx1, margin: '0 0 1.25rem' }}>
             🗺️ Plan Your Route
           </h2>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
             {/* Origin */}
             <div>
-              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: '#3D5A80', marginBottom: '0.375rem' }}>
+              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: tx2, marginBottom: '0.375rem' }}>
                 🟢 Origin
               </label>
               <input type="text" placeholder="Your current location" value={origin}
@@ -476,7 +473,7 @@ export default function EvacuationPage() {
 
             {/* Destination */}
             <div>
-              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: '#3D5A80', marginBottom: '0.375rem' }}>
+              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: tx2, marginBottom: '0.375rem' }}>
                 🔴 Destination
               </label>
               <input type="text" placeholder="Safe destination or pick a shelter ↓" value={destination}
@@ -489,17 +486,17 @@ export default function EvacuationPage() {
                     <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.7rem', fontWeight: 700, color: N, textShadow: 'none' }}>
                       🏥 Nearest Shelters — estimated drive time from origin
                     </span>
-                    {shelters.length > 0 && <span style={{ fontSize: '0.65rem', color: '#5B7FA5', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{shelters.length} found</span>}
+                    {shelters.length > 0 && <span style={{ fontSize: '0.65rem', color: txMt, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{shelters.length} found</span>}
                   </div>
 
                   {shelterLoading ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.85rem 1rem' }}>
                       <div style={{ width: 16, height: 16, flexShrink: 0, border: '2px solid rgba(37,99,235,0.2)', borderTop: `2px solid ${N}`, borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', color: '#3D5A80' }}>Searching for nearby emergency shelters…</span>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', color: tx2 }}>Searching for nearby emergency shelters…</span>
                     </div>
                   ) : shelters.length === 0 ? (
                     <div style={{ padding: '0.85rem 1rem' }}>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', color: '#5B7FA5' }}>No tagged shelters found within 100 km — enter a destination manually.</span>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.8rem', color: txMt }}>No tagged shelters found within 100 km — enter a destination manually.</span>
                     </div>
                   ) : !showShelters ? null : (
                     shelters.map((s, i) => {
@@ -508,15 +505,15 @@ export default function EvacuationPage() {
                       return (
                         <button key={i} onClick={() => selectShelter(s)} onDoubleClick={() => { selectShelter(s); setShowShelters(false) }}
                           style={{ display: 'flex', width: '100%', alignItems: 'center', gap: '0.75rem', padding: '0.65rem 0.85rem', background: isSelected ? 'rgba(37,99,235,0.07)' : 'none', border: 'none', borderBottom: i < shelters.length - 1 ? '1px solid rgba(37,99,235,0.08)' : 'none', borderLeft: isSelected ? `3px solid ${N}` : '3px solid transparent', cursor: 'pointer', textAlign: 'left' }}>
-                          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 800, color: '#5B7FA5', width: '1.1rem', flexShrink: 0 }}>#{i + 1}</span>
+                          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.68rem', fontWeight: 800, color: txMt, width: '1.1rem', flexShrink: 0 }}>#{i + 1}</span>
                           <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{emoji}</span>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 600, color: '#1A3558', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.name}</div>
-                            <div style={{ fontSize: '0.68rem', color: '#5B7FA5', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.type}</div>
+                            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 600, color: tx1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.name}</div>
+                            <div style={{ fontSize: '0.68rem', color: txMt, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.type}</div>
                           </div>
                           <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 800, color: isSelected ? N : '#1A3558', textShadow: 'none' }}>{fmtEta(s.etaMin)}</div>
-                            <div style={{ fontSize: '0.68rem', color: '#5B7FA5', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.distMiles.toFixed(1)} mi</div>
+                            <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', fontWeight: 800, color: isSelected ? N : tx1 }}>{fmtEta(s.etaMin)}</div>
+                            <div style={{ fontSize: '0.68rem', color: txMt, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{s.distMiles.toFixed(1)} mi</div>
                           </div>
                         </button>
                       )
@@ -524,7 +521,7 @@ export default function EvacuationPage() {
                   )}
                   {shelters.length > 0 && (
                     <div style={{ padding: '0.4rem 0.85rem', borderTop: '1px solid rgba(37,99,235,0.08)' }}>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: '#5B7FA5', fontStyle: 'italic' }}>Times are estimates. Actual drive time shown after routing.</span>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.65rem', color: txMt, fontStyle: 'italic' }}>Times are estimates. Actual drive time shown after routing.</span>
                     </div>
                   )}
                 </div>
@@ -533,7 +530,7 @@ export default function EvacuationPage() {
 
             {/* Disaster type */}
             <div>
-              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: '#3D5A80', marginBottom: '0.375rem' }}>
+              <label style={{ display: 'block', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.78rem', fontWeight: 700, color: tx2, marginBottom: '0.375rem' }}>
                 ⚡ Disaster Type
               </label>
               <select value={disasterType} onChange={e => setDisasterType(e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
@@ -560,12 +557,12 @@ export default function EvacuationPage() {
           <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '55vh', width: '100%', borderRadius: '1rem' }} scrollWheelZoom>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              url={isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'}
             />
             {routeCoords && (
               <>
                 <FitBounds positions={routeCoords} />
-                <Polyline positions={routeCoords} pathOptions={{ color: '#2563EB', weight: 5, opacity: 0.9 }} />
+                <Polyline positions={routeCoords} pathOptions={{ color: N, weight: 5, opacity: 0.9 }} />
               </>
             )}
             {originPos && <Marker position={originPos} icon={greenIcon}><Popup><strong>Origin</strong><br />{origin}</Popup></Marker>}
@@ -581,7 +578,7 @@ export default function EvacuationPage() {
         {/* ── Route Summary ── */}
         {routeMeta && (
           <div style={{ ...glass, marginBottom: '1.5rem' }}>
-            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.15rem', fontWeight: 800, color: '#1A3558', margin: '0 0 1.25rem', textShadow: 'none' }}>
+            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.15rem', fontWeight: 800, color: tx1, margin: '0 0 1.25rem' }}>
               📊 Route Summary
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
@@ -593,8 +590,8 @@ export default function EvacuationPage() {
               ].map(item => (
                 <div key={item.label} style={statCard}>
                   <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>{item.icon}</div>
-                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.25rem', fontWeight: 800, color: N, marginBottom: '0.2rem', textShadow: 'none' }}>{item.value}</div>
-                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: '#3D5A80' }}>{item.label}</div>
+                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.25rem', fontWeight: 800, color: N, marginBottom: '0.2rem' }}>{item.value}</div>
+                  <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.72rem', color: tx2 }}>{item.label}</div>
                 </div>
               ))}
             </div>
@@ -610,17 +607,17 @@ export default function EvacuationPage() {
         {/* ── AI Checklist ── */}
         {(checklistLoading || hasChecklist) && (
           <div style={{ marginBottom: '1.5rem' }}>
-            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.25rem', fontWeight: 800, color: '#1A3558', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', textShadow: 'none' }}>
+            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.25rem', fontWeight: 800, color: tx1, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', textShadow: 'none' }}>
               🤖 AI Evacuation Checklist
               <span style={{ background: 'rgba(124,58,237,0.2)', border: '1px solid rgba(124,58,237,0.3)', borderRadius: '9999px', padding: '0.15rem 0.6rem', fontSize: '0.7rem', color: '#A78BFA', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Gemma 3 27B</span>
             </h2>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', color: '#3D5A80', marginBottom: '1rem' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.82rem', color: tx2, marginBottom: '1rem' }}>
               Personalized for a {disasterType.toLowerCase()} evacuation · Click items to check off
             </p>
             {checklistLoading ? (
               <div style={{ ...glass, display: 'flex', alignItems: 'center', gap: '1rem', justifyContent: 'center', padding: '2rem' }}>
                 <div style={{ width: 28, height: 28, border: '3px solid rgba(37,99,235,0.15)', borderTop: `3px solid ${N}`, borderRadius: '50%', animation: 'spin 0.9s linear infinite' }} />
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.9rem', color: '#3D5A80' }}>Generating personalized checklist…</span>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.9rem', color: tx2 }}>Generating personalized checklist…</span>
               </div>
             ) : (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
@@ -634,23 +631,23 @@ export default function EvacuationPage() {
 
         {/* ── Tips ── */}
         <section>
-          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.25rem', fontWeight: 800, color: '#1A3558', marginBottom: '1rem', textAlign: 'center', textShadow: 'none' }}>
+          <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.25rem', fontWeight: 800, color: tx1, marginBottom: '1rem', textAlign: 'center' }}>
             Essential Evacuation Tips
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
             {TIPS.map(tip => (
               <div key={tip.title} style={{ ...glass, display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
                 <div style={{ fontSize: '2rem' }}>{tip.icon}</div>
-                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1rem', fontWeight: 800, color: '#1A3558', margin: 0 }}>{tip.title}</h3>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.875rem', color: '#3D5A80', lineHeight: 1.6, margin: 0 }}>{tip.body}</p>
+                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1rem', fontWeight: 800, color: tx1, margin: 0 }}>{tip.title}</h3>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.875rem', color: tx2, lineHeight: 1.6, margin: 0 }}>{tip.body}</p>
               </div>
             ))}
           </div>
         </section>
       </main>
 
-      <footer style={{ borderTop: '1px solid rgba(99,150,222,0.2)', padding: '1.5rem', textAlign: 'center' }}>
-        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', color: '#5B7FA5' }}>
+      <footer style={{ borderTop: `1px solid ${isDark ? 'rgba(0,196,255,0.1)' : 'rgba(99,150,222,0.2)'}`, padding: '1.5rem', textAlign: 'center' }}>
+        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.75rem', color: txMt }}>
           © 2026 BUHHS · Evacuation data from OpenStreetMap &amp; OSRM · For informational use only
         </span>
       </footer>

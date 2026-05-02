@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import ThemeToggle, { useTheme } from './components/ThemeToggle';
+import LanguagePopup from './components/LanguagePopup';
 
 // FadeIn component: A wrapper that starts with opacity: 0 and transitions to opacity: 1 
 // after a configurable delay (ms) using a setTimeout + React state.
@@ -63,6 +65,7 @@ const AnimatedHeading = ({ text, initialDelay = 200, charDelay = 30 }) => {
 };
 
 export default function App() {
+  const { theme, toggle } = useTheme();
   return (
     <div className="relative min-h-screen w-full overflow-hidden font-sans bg-black">
       {/* Video Background */}
@@ -102,7 +105,10 @@ export default function App() {
               </Link>
             </div>
 
-            <div className="w-24"></div>
+            <div className="flex items-center gap-2">
+              <ThemeToggle theme={theme} onToggle={toggle} />
+              <LanguagePopup />
+            </div>
           </div>
         </nav>
 
