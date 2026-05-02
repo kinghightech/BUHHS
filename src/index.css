@@ -234,3 +234,50 @@
 [data-theme="dark"] .ds-voice-panel-header { background: linear-gradient(135deg, rgba(37,99,235,0.12) 0%, rgba(75,150,243,0.07) 100%) !important; border-bottom-color: rgba(99,150,222,0.18) !important; }
 [data-theme="dark"] .ds-voice-text-input { background: rgba(22,32,56,0.85) !important; color: var(--ds-text-primary) !important; border-color: rgba(99,150,222,0.22) !important; }
 [data-theme="dark"] .ds-voice-hint { background: var(--ds-surface) !important; color: var(--ds-text-primary) !important; border-color: var(--ds-border) !important; }
+
+/* ─── BuhhsCast / Business Owner Flow ────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
+
+.font-geist { font-family: 'Geist', 'Geist Sans', system-ui, sans-serif; }
+
+/* Fade-in-up animation used by the buhhscast onboarding cards */
+@keyframes bcFadeInUp {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: bcFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Google Places autocomplete — dark glass dropdown matching Haven's aesthetic */
+.pac-container {
+  z-index: 10000 !important;
+  background-color: rgba(20, 20, 20, 0.95) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  border-radius: 12px !important;
+  margin-top: 6px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6) !important;
+  font-family: 'Geist', 'Plus Jakarta Sans', sans-serif !important;
+  padding: 4px 0 !important;
+}
+.pac-item {
+  padding: 10px 16px !important;
+  color: rgba(255, 255, 255, 0.80) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+  cursor: pointer !important;
+  font-size: 14px !important;
+  transition: background 0.2s ease;
+}
+.pac-item:first-child { border-top: none !important; }
+.pac-item:hover { background-color: rgba(255, 255, 255, 0.10) !important; }
+.pac-item-query { color: white !important; font-weight: 500 !important; }
+.pac-matched { color: rgba(138, 194, 255, 0.95) !important; font-weight: 600 !important; }
+.pac-icon { filter: invert(1) brightness(0.7) !important; }
+.pac-item-selected, .pac-item-selected:hover { background-color: rgba(255, 255, 255, 0.15) !important; }
+
+/* Tailwind v4 doesn't ship the `bg-background`/`text-foreground` semantic colors that
+   buhhscast's components reference. Provide them as plain classes so nothing 404s. */
+.bg-background { background-color: #060b1b; }
+.text-foreground { color: #f1f6fc; }

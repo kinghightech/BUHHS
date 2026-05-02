@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@fontsource/geist-sans": "^5.2.5",
     "@supabase/supabase-js": "^2.105.1",
     "@tensorflow/tfjs": "^4.22.0",
     "@vitejs/plugin-react": "^6.0.1",
