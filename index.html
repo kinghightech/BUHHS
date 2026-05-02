@@ -1,86 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BUHHS 2026 | Authentication</title>
-    <meta name="description" content="Secure login and sign up for the BUHHS 2026 Hackathon.">
-    <link rel="stylesheet" href="style.css">
-    <!-- Google Fonts -->
+    <title>VEX | Shaping Tomorrow</title>
+    <meta name="description" content="VEX - Shaping tomorrow with vision and action.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
-
-<body>
-    <div class="background-blobs">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-    </div>
-
-    <main class="auth-container" id="auth-container">
-        <!-- Auth Card -->
-        <div class="glass-card" id="auth-card">
-            <div class="auth-header">
-                <div class="logo">BUHHS<span>2026</span></div>
-                <h1 id="auth-title">Welcome Back</h1>
-                <p id="auth-subtitle">Enter your details to access your account</p>
-            </div>
-
-            <!-- Login Form -->
-            <form id="login-form" class="auth-form">
-                <div class="input-group">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" placeholder="name@example.com" required>
-                </div>
-                <div class="input-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn-primary" id="login-btn">Sign In</button>
-                <p class="toggle-text">Don't have an account? <a href="#" id="show-signup">Sign up</a></p>
-            </form>
-
-            <!-- Sign Up Form (Hidden by default) -->
-            <form id="signup-form" class="auth-form hidden">
-                <div class="input-group">
-                    <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" placeholder="name@example.com" required>
-                </div>
-                <div class="input-group">
-                    <label for="signup-password">Password</label>
-                    <input type="password" id="signup-password" placeholder="••••••••" required>
-                </div>
-                <div class="input-group">
-                    <label for="signup-confirm-password">Confirm Password</label>
-                    <input type="password" id="signup-confirm-password" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn-primary" id="signup-btn">Create Account</button>
-                <p class="toggle-text">Already have an account? <a href="#" id="show-login">Log in</a></p>
-            </form>
-
-            <div id="auth-message" class="message"></div>
-        </div>
-
-        <!-- Success Screen (Hidden by default) -->
-        <div class="glass-card hidden" id="success-card">
-            <div class="success-content">
-                <div class="success-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                    </svg>
-                </div>
-                <h1>Congrats!</h1>
-                <p>You have successfully signed in.</p>
-                <button id="logout-btn" class="btn-secondary">Sign Out</button>
-            </div>
-        </div>
-    </main>
-
+<body class="bg-black text-white antialiased">
+    <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 </body>
-
 </html>
