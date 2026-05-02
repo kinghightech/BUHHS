@@ -1,0 +1,628 @@
+// Simulated 319 positive user reflections on website accuracy
+// Each response includes a rating (1-5), category, comment, and date
+
+const NAMES_WITH_ORIGINS = [
+  // African American
+  { name: 'Jamal', origin: 'Atlanta, GA' },
+  { name: 'Aaliyah', origin: 'Chicago, IL' },
+  { name: 'DeShawn', origin: 'Houston, TX' },
+  { name: 'Imani', origin: 'Baltimore, MD' },
+  { name: 'Terrence', origin: 'Detroit, MI' },
+  { name: 'Keisha', origin: 'Memphis, TN' },
+  { name: 'Marcus', origin: 'Oakland, CA' },
+  { name: 'Tamika', origin: 'Charlotte, NC' },
+  { name: 'Darius', origin: 'Richmond, VA' },
+  { name: 'Zora', origin: 'New Orleans, LA' },
+  { name: 'Trayvon', origin: 'Birmingham, AL' },
+  { name: 'Brianna', origin: 'St. Louis, MO' },
+  { name: 'Elijah', origin: 'Washington, DC' },
+  { name: 'Latasha', origin: 'Jackson, MS' },
+  { name: 'Quincy', origin: 'Louisville, KY' },
+  { name: 'Destiny', origin: 'Indianapolis, IN' },
+  // Latino / Hispanic
+  { name: 'Carlos', origin: 'Miami, FL' },
+  { name: 'Maria', origin: 'San Antonio, TX' },
+  { name: 'Alejandro', origin: 'Los Angeles, CA' },
+  { name: 'Gabriela', origin: 'Phoenix, AZ' },
+  { name: 'Diego', origin: 'Denver, CO' },
+  { name: 'Valentina', origin: 'Albuquerque, NM' },
+  { name: 'Luis', origin: 'New York, NY' },
+  { name: 'Isabella', origin: 'Orlando, FL' },
+  { name: 'Rodrigo', origin: 'El Paso, TX' },
+  { name: 'Camila', origin: 'Fresno, CA' },
+  { name: 'Andres', origin: 'Houston, TX' },
+  { name: 'Lucia', origin: 'Tampa, FL' },
+  { name: 'Emilio', origin: 'Tucson, AZ' },
+  { name: 'Fernanda', origin: 'Chicago, IL' },
+  { name: 'Rafael', origin: 'Austin, TX' },
+  { name: 'Marisol', origin: 'Las Vegas, NV' },
+  // East Asian — Chinese
+  { name: 'Wei', origin: 'San Francisco, CA' },
+  { name: 'Mei-Ling', origin: 'Flushing, NY' },
+  { name: 'Jingyi', origin: 'Los Angeles, CA' },
+  { name: 'Bowen', origin: 'Irvine, CA' },
+  { name: 'Xiu', origin: 'Seattle, WA' },
+  { name: 'Zheng', origin: 'Houston, TX' },
+  // East Asian — Japanese
+  { name: 'Hiroshi', origin: 'Seattle, WA' },
+  { name: 'Yuki', origin: 'Honolulu, HI' },
+  { name: 'Takeshi', origin: 'Portland, OR' },
+  { name: 'Akemi', origin: 'Los Angeles, CA' },
+  { name: 'Kenji', origin: 'San Jose, CA' },
+  { name: 'Haruka', origin: 'San Diego, CA' },
+  // East Asian — Korean
+  { name: 'Jun-Ho', origin: 'Los Angeles, CA' },
+  { name: 'Soo-Jin', origin: 'Irvine, CA' },
+  { name: 'Min-Ji', origin: 'Fort Lee, NJ' },
+  { name: 'Seung', origin: 'Annandale, VA' },
+  { name: 'Eun-Young', origin: 'Koreatown, CA' },
+  { name: 'Hyun', origin: 'Chicago, IL' },
+  // South Asian — Indian
+  { name: 'Rohan', origin: 'Edison, NJ' },
+  { name: 'Priya', origin: 'Fremont, CA' },
+  { name: 'Arjun', origin: 'Plano, TX' },
+  { name: 'Ananya', origin: 'Naperville, IL' },
+  { name: 'Sanjay', origin: 'Bethesda, MD' },
+  { name: 'Nisha', origin: 'Raleigh, NC' },
+  { name: 'Vikram', origin: 'Sunnyvale, CA' },
+  { name: 'Deepa', origin: 'Jersey City, NJ' },
+  { name: 'Rahul', origin: 'Austin, TX' },
+  { name: 'Pooja', origin: 'Atlanta, GA' },
+  // South Asian — Pakistani / Bangladeshi
+  { name: 'Fatima', origin: 'Dearborn, MI' },
+  { name: 'Amir', origin: 'Houston, TX' },
+  { name: 'Bilal', origin: 'Paterson, NJ' },
+  { name: 'Zara', origin: 'Chicago, IL' },
+  { name: 'Tariq', origin: 'Dallas, TX' },
+  { name: 'Sadia', origin: 'Bronx, NY' },
+  // Middle Eastern / North African
+  { name: 'Omar', origin: 'Brooklyn, NY' },
+  { name: 'Layla', origin: 'Dearborn, MI' },
+  { name: 'Hassan', origin: 'Falls Church, VA' },
+  { name: 'Yasmin', origin: 'Anaheim, CA' },
+  { name: 'Khalil', origin: 'Paterson, NJ' },
+  { name: 'Nour', origin: 'Chicago, IL' },
+  { name: 'Rania', origin: 'Houston, TX' },
+  { name: 'Youssef', origin: 'Los Angeles, CA' },
+  { name: 'Amira', origin: 'Sterling, VA' },
+  { name: 'Tariq', origin: 'Detroit, MI' },
+  // European / White American
+  { name: 'James', origin: 'Boston, MA' },
+  { name: 'Emily', origin: 'Nashville, TN' },
+  { name: 'Patrick', origin: 'Philadelphia, PA' },
+  { name: 'Sarah', origin: 'Minneapolis, MN' },
+  { name: 'Michael', origin: 'Columbus, OH' },
+  { name: 'Katherine', origin: 'Portland, ME' },
+  { name: 'Nikolai', origin: 'Anchorage, AK' },
+  { name: 'Sofia', origin: 'Milwaukee, WI' },
+  { name: 'Thomas', origin: 'Denver, CO' },
+  { name: 'Claire', origin: 'Charlotte, NC' },
+  { name: 'Brendan', origin: 'Providence, RI' },
+  { name: 'Megan', origin: 'Pittsburgh, PA' },
+  { name: 'Connor', origin: 'Kansas City, MO' },
+  { name: 'Allison', origin: 'Richmond, VA' },
+  { name: 'Tyler', origin: 'Salt Lake City, UT' },
+  { name: 'Hannah', origin: 'Madison, WI' },
+  // Western / Southern European
+  { name: 'Luca', origin: 'New York, NY' },
+  { name: 'Chiara', origin: 'San Francisco, CA' },
+  { name: 'Marco', origin: 'Miami, FL' },
+  { name: 'Elena', origin: 'Chicago, IL' },
+  { name: 'Antoine', origin: 'New Orleans, LA' },
+  { name: 'Isabelle', origin: 'Boston, MA' },
+  // Scandinavian / Northern European
+  { name: 'Bjorn', origin: 'Minneapolis, MN' },
+  { name: 'Sigrid', origin: 'Seattle, WA' },
+  { name: 'Lars', origin: 'Portland, OR' },
+  { name: 'Astrid', origin: 'Fargo, ND' },
+  // Native American / Indigenous
+  { name: 'Kai', origin: 'Flagstaff, AZ' },
+  { name: 'Aiyana', origin: 'Tulsa, OK' },
+  { name: 'Dakota', origin: 'Rapid City, SD' },
+  { name: 'Nina', origin: 'Tacoma, WA' },
+  { name: 'Tohono', origin: 'Tucson, AZ' },
+  { name: 'Chenoa', origin: 'Albuquerque, NM' },
+  { name: 'Chayton', origin: 'Bismarck, ND' },
+  { name: 'Winona', origin: 'Duluth, MN' },
+  // Pacific Islander
+  { name: 'Kalani', origin: 'Honolulu, HI' },
+  { name: 'Moana', origin: 'Kailua, HI' },
+  { name: 'Tane', origin: 'Salt Lake City, UT' },
+  { name: 'Leilani', origin: 'Sacramento, CA' },
+  { name: 'Sione', origin: 'Long Beach, CA' },
+  { name: 'Hina', origin: 'Compton, CA' },
+  // West African (immigrant)
+  { name: 'Kwame', origin: 'Silver Spring, MD' },
+  { name: 'Amara', origin: 'Minneapolis, MN' },
+  { name: 'Chidi', origin: 'Katy, TX' },
+  { name: 'Nia', origin: 'Columbus, OH' },
+  { name: 'Kofi', origin: 'Bronx, NY' },
+  { name: 'Abena', origin: 'Washington, DC' },
+  { name: 'Emeka', origin: 'Atlanta, GA' },
+  { name: 'Chisom', origin: 'Houston, TX' },
+  // East African (immigrant)
+  { name: 'Dawit', origin: 'Washington, DC' },
+  { name: 'Tigist', origin: 'Minneapolis, MN' },
+  { name: 'Abdi', origin: 'Columbus, OH' },
+  { name: 'Hodan', origin: 'Seattle, WA' },
+  { name: 'Tesfaye', origin: 'Dallas, TX' },
+  { name: 'Miriam', origin: 'San Diego, CA' },
+  // Caribbean
+  { name: 'Andre', origin: 'Fort Lauderdale, FL' },
+  { name: 'Simone', origin: 'Hartford, CT' },
+  { name: 'Damian', origin: 'Newark, NJ' },
+  { name: 'Camille', origin: 'Miami, FL' },
+  { name: 'Jean-Pierre', origin: 'Boston, MA' },
+  { name: 'Claudette', origin: 'Brooklyn, NY' },
+  { name: 'Desmond', origin: 'Bridgeport, CT' },
+  { name: 'Yvette', origin: 'Orlando, FL' },
+  // Eastern European
+  { name: 'Andrei', origin: 'Chicago, IL' },
+  { name: 'Katarina', origin: 'Pittsburgh, PA' },
+  { name: 'Dmitri', origin: 'Brooklyn, NY' },
+  { name: 'Ivana', origin: 'Cleveland, OH' },
+  { name: 'Bogdan', origin: 'Detroit, MI' },
+  { name: 'Olena', origin: 'Sacramento, CA' },
+  { name: 'Pavel', origin: 'Boston, MA' },
+  { name: 'Natasha', origin: 'Philadelphia, PA' },
+  // Southeast Asian — Vietnamese / Thai / Filipino
+  { name: 'Thanh', origin: 'Houston, TX' },
+  { name: 'Ariya', origin: 'Long Beach, CA' },
+  { name: 'Rizal', origin: 'Virginia Beach, VA' },
+  { name: 'Malaya', origin: 'Las Vegas, NV' },
+  { name: 'Bao', origin: 'New Orleans, LA' },
+  { name: 'Nang', origin: 'Minneapolis, MN' },
+  { name: 'Eduardo', origin: 'Daly City, CA' },
+  { name: 'Maribel', origin: 'Jersey City, NJ' },
+  // Central / South American
+  { name: 'Joaquin', origin: 'New York, NY' },
+  { name: 'Rebeca', origin: 'Los Angeles, CA' },
+  { name: 'Mateo', origin: 'Chicago, IL' },
+  { name: 'Catalina', origin: 'Houston, TX' },
+  // Mixed / Multiracial
+  { name: 'Jordan', origin: 'Austin, TX' },
+  { name: 'Maya', origin: 'Denver, CO' },
+  { name: 'Ezra', origin: 'San Diego, CA' },
+  { name: 'Naomi', origin: 'Seattle, WA' },
+  { name: 'River', origin: 'Portland, OR' },
+  { name: 'Sage', origin: 'Oakland, CA' },
+  { name: 'Phoenix', origin: 'Phoenix, AZ' },
+  { name: 'Indigo', origin: 'Brooklyn, NY' },
+]
+
+const CATEGORIES = ['accuracy', 'usefulness', 'design', 'data_quality', 'overall']
+
+// 320 unique comments — one per review, no duplicates
+const POSITIVE_COMMENTS = [
+  // ── Accuracy (64 comments) ──────────────────────────────────────────────
+  "The risk assessments matched exactly what our county emergency manager told us.",
+  "I cross-checked the hazard data with FEMA's NRI and everything lined up perfectly.",
+  "Very accurate flood risk estimates for my ZIP code area.",
+  "The financial impact calculations were surprisingly close to our actual insurance claim.",
+  "Earthquake risk rating was spot-on for our region.",
+  "The tornado probability matched historical data I found from NOAA.",
+  "Hurricane risk assessment was very realistic for our coastal area.",
+  "Winter weather severity ratings were accurate for our Northeast location.",
+  "The wildfire risk level matched what our local fire department communicated.",
+  "Hail damage estimates were very close to what we experienced last year.",
+  "The drought severity scale aligned perfectly with the US Drought Monitor.",
+  "Multi-hazard risk index accurately captured our area's compound risk.",
+  "Property damage estimates were within 10% of our actual repair costs.",
+  "The severity grading system provides a very accurate picture of real risk.",
+  "Insurance coverage gap analysis was very accurate for our situation.",
+  "The expected annual loss calculation matched our insurer's assessment closely.",
+  "Risk classification for our county was consistent with state emergency reports.",
+  "The probability model for flooding was validated by our recent experience.",
+  "Coastal flood risk accurately reflected our property's elevation zone.",
+  "The actuarial model seems very well-calibrated for residential properties.",
+  "Our home was damaged in last year's storm and the cost estimate here was almost identical to our repair bill.",
+  "I compared the hazard ratings with my state's hazard mitigation plan and they were consistent.",
+  "The car damage projections for hail were remarkably accurate based on our claim last spring.",
+  "Lightning risk rating for our county was validated by our local utility's outage data.",
+  "The flood severity tiers match what our floodplain administrator described at a town meeting.",
+  "Wind damage estimates were within a few hundred dollars of what our contractor quoted.",
+  "After the ice storm last winter, I can confirm the severity rating here was correct for our area.",
+  "The heat wave risk classification was consistent with our county health department's warnings.",
+  "Our insurer quoted us almost the exact same expected annual loss that this tool calculated.",
+  "The renter damage estimate was accurate — my friend's apartment flooded and the numbers were close.",
+  "Tsunami risk for our coastal town was rated appropriately low, which matches historical records.",
+  "The compound risk score for our area matched the risk profile our mortgage lender used.",
+  "I'm a civil engineer and the structural damage factors used here are reasonable and well-sourced.",
+  "Avalanche risk was correctly identified as minimal for our valley location.",
+  "The cold wave severity rating matched the National Weather Service's winter outlook for our region.",
+  "Landslide probability for our hillside neighborhood was accurately flagged as elevated.",
+  "Volcanic risk was correctly rated as negligible for our East Coast location.",
+  "The strong wind probability aligned with our area's history of nor'easters.",
+  "Ice storm damage estimates were validated when we got hit two months after checking this tool.",
+  "The exposure factor options realistically reflect the range of property protections available.",
+  "Our vulnerability rating matched what our home inspector identified about our construction quality.",
+  "The five-tier severity system gives a nuanced picture rather than just high or low.",
+  "I verified the earthquake magnitude scale against USGS data and it checks out.",
+  "Hurricane category ratings in the tool correspond exactly to the Saffir-Simpson scale.",
+  "The EF-scale tornado ratings are properly calibrated to real Enhanced Fujita scale definitions.",
+  "Flood severity labels match FEMA flood zone classifications accurately.",
+  "The wildfire danger scale corresponds well with the National Fire Danger Rating System.",
+  "Winter storm severity tiers are consistent with NWS watch/warning/advisory levels.",
+  "Drought severity labels correctly follow the D0-D4 US Drought Monitor classification.",
+  "The hail size categories use proper meteorological references that I could verify.",
+  "Risk ratings for my ZIP code were consistent with what my homeowner's insurance underwriter uses.",
+  "The per-hazard annual probability numbers look reasonable compared to academic literature.",
+  "Damage coefficients for renters vs. owners correctly reflect the different exposure profiles.",
+  "I ran several ZIP codes I'm familiar with and the relative risk rankings all made sense.",
+  "Our real estate appraiser confirmed the risk profile this tool generated for our property.",
+  "After three years in our home, the cumulative losses we've seen track closely with the annual estimate.",
+  "The financial model correctly accounts for the fact that earthquakes damage homes more than cars.",
+  "Car damage ratios for different hazards seem well-researched — flooding does destroy vehicles.",
+  "The tool correctly identified winter weather as our area's primary risk, not hurricanes.",
+  "Probability of a major event in our area matched what our county's FEMA liaison told us.",
+  "The severity factor for a Category 3 hurricane is aggressive but realistic given recent storms.",
+  "I work in insurance and the EAL formula used here is industry-standard methodology.",
+  "Multiple family members in different states all got risk profiles that made geographic sense.",
+  "The out-of-pocket gap calculation correctly showed how underinsured we were.",
+
+  // ── Usefulness (64 comments) ────────────────────────────────────────────
+  "This tool helped us decide on the right insurance coverage level.",
+  "We used the risk assessment to negotiate better insurance rates.",
+  "The financial breakdown helped us understand where to invest in mitigation.",
+  "Really helpful for comparing risk across different ZIP codes before buying a home.",
+  "The severity selector helped us understand best and worst case scenarios.",
+  "Great tool for emergency preparedness planning at the household level.",
+  "Used this to convince my family to create an emergency fund.",
+  "The car damage estimates helped us decide on comprehensive coverage.",
+  "Helped us understand why our insurance premiums were so high.",
+  "The multi-hazard view was incredibly useful for understanding compound risks.",
+  "We used this for our community emergency planning committee meeting.",
+  "Perfect for homebuyers trying to understand area-specific risks.",
+  "The insurance suggestions feature saved us money on our policy.",
+  "Great educational tool for teaching kids about disaster preparedness.",
+  "Helped us prioritize which home improvements to make first.",
+  "The exposure and vulnerability factors made the assessment very personalized.",
+  "We shared this with our entire neighborhood association.",
+  "Useful for rental property investment decisions.",
+  "The renter mode was perfect for our apartment situation.",
+  "Helped us build a realistic emergency savings goal.",
+  "My spouse and I used this to decide between two neighborhoods when house hunting.",
+  "The tool motivated us to finally get flood insurance — we had no idea our risk was that high.",
+  "I showed the out-of-pocket estimate to my landlord and they upgraded the building's insurance.",
+  "We used the severity what-if feature to plan for both mild and catastrophic scenarios.",
+  "This helped our HOA board decide to invest in better storm drainage for the community.",
+  "As a financial planner, I now recommend this tool to every client who owns property.",
+  "The car value lookup saved me from overpaying for comprehensive coverage.",
+  "We adjusted our deductible after seeing how much out-of-pocket risk we actually had.",
+  "Perfect for understanding whether earthquake insurance is worth the premium in our area.",
+  "I used the renter mode to figure out exactly how much renters insurance I actually need.",
+  "The hazard pie chart made it obvious that winter weather was our biggest threat, not tornadoes.",
+  "Helped me explain to my elderly parents why they need to update their homeowner's policy.",
+  "We canceled unnecessary riders on our policy after seeing which risks were actually low.",
+  "The tool helped our church group organize a disaster preparedness workshop for the congregation.",
+  "I used it to evaluate risk for three rental properties I manage — very efficient.",
+  "My college students used this as part of a personal finance assignment and loved it.",
+  "We increased our emergency fund target by 40% after seeing the realistic damage estimates.",
+  "The address search feature made it easy to estimate our home value without an appraisal.",
+  "This convinced my roommates to split the cost of renters insurance for our apartment.",
+  "I used the different severity levels to create a tiered emergency response plan for my family.",
+  "The insurance optimization analysis identified $800 per year in coverage we didn't need.",
+  "Helped our small business assess risk at three different warehouse locations.",
+  "We used this to compare risk before and after installing storm shutters on our coastal home.",
+  "The VR simulator helped my kids understand what to actually do during an earthquake.",
+  "Our family now has a go-bag packed because the severity estimates made the risk feel real.",
+  "I recommended this to my whole office after using it for our company's continuity planning.",
+  "The voice assistant made it accessible for my grandmother who isn't comfortable with computers.",
+  "We used the health assessment alongside the disaster tool for a complete family risk review.",
+  "The claims assessment tool helped me understand how much damage our roof actually sustained.",
+  "This is now part of our annual family financial review process every January.",
+  "I used it to justify a home generator purchase to my partner — the outage risk data helped.",
+  "The multi-language feature meant my parents could use it in Spanish without my help.",
+  "Helped us decide to move our important documents to a fireproof safe after seeing wildfire risk.",
+  "We restructured our entire insurance portfolio based on the optimization recommendations.",
+  "The tool helped our neighborhood start a mutual aid group focused on our specific hazards.",
+  "I'm a real estate agent and now run this for every client before they make an offer.",
+  "Used the exposure factor to quantify the value of the flood wall our city recently built.",
+  "The severity scenario tool helped us decide whether to reinforce our garage door for hurricanes.",
+  "I shared the results with my insurance agent and they were able to fine-tune our policy.",
+  "We used this to apply for a FEMA hazard mitigation grant and the data supported our application.",
+  "The tool helped us understand that our biggest financial risk was actually our uninsured car.",
+  "My book club turned into a disaster preparedness meeting after I showed them this tool.",
+  "We chose our retirement home location partly based on the comparative risk assessments.",
+  "The insurance gap visualization made it crystal clear where we needed to increase coverage.",
+
+  // ── Design (64 comments) ────────────────────────────────────────────────
+  "The interface is clean and very easy to navigate.",
+  "Love the pie chart showing hazard distribution — very intuitive.",
+  "The step-by-step process made it simple to complete the assessment.",
+  "Color coding for severity levels is brilliant and easy to understand.",
+  "The map integration makes it feel professional and trustworthy.",
+  "Mobile-friendly design worked great on my phone.",
+  "The dark mode is easy on the eyes for extended reading.",
+  "Multi-language support is a great feature for our diverse community.",
+  "The intro animation was a nice touch — sets the tone well.",
+  "Charts and graphs made the data very digestible.",
+  "Really polished look — feels like a professional financial tool.",
+  "The severity selector with color-coded buttons is very intuitive.",
+  "Clean layout with no clutter — everything has a purpose.",
+  "Smooth transitions and responsive design throughout.",
+  "The insurance analysis section is beautifully organized.",
+  "The shield logo gives it a sense of protection and trust — great branding choice.",
+  "Switching between dark and light mode is seamless and both look great.",
+  "The sticky navigation bar means I never lose my place even on long pages.",
+  "The emerald accent color feels modern and calming without being corporate.",
+  "I love that clicking a pie chart slice instantly recalculates everything — very interactive.",
+  "The step badges at the top make it clear exactly where I am in the process.",
+  "Typography choices are excellent — easy to read even with lots of numbers.",
+  "The hazard icons are intuitive and help quickly identify each risk type.",
+  "Loading states and transitions feel smooth, not jarring or laggy.",
+  "The results panel expands cleanly without pushing content around awkwardly.",
+  "Bar charts for damage comparison are clear and well-labeled.",
+  "The severity buttons with the 'actual' badge on the real tier are a smart touch.",
+  "Flag icons for the language switcher make it instantly recognizable.",
+  "The gradient header sets a professional tone right from the start.",
+  "Input fields have good formatting — auto-commas for dollar amounts are helpful.",
+  "The owner/renter toggle is clean and changes the form dynamically without a full reload.",
+  "Disclaimer banners are present but not intrusive — good balance.",
+  "The team section on the homepage feels personal and approachable.",
+  "The stat bar with key numbers immediately communicates the tool's scope.",
+  "Hover effects on cards and buttons feel responsive and polished.",
+  "The methodology section expands for those who want detail but doesn't clutter the view.",
+  "I appreciate that the design doesn't sacrifice information density for aesthetics.",
+  "The color gradient from green to red for severity is universally understandable.",
+  "Font sizes are well-chosen — headings pop and body text is comfortable to read.",
+  "The three-column card layout on the home page gives a clear overview of all features.",
+  "Tab navigation on the reflections page is snappy and doesn't require a page reload.",
+  "The weekly trend chart in analytics uses a clean bar design that's easy to scan.",
+  "Star ratings use a warm amber color that stands out without being garish.",
+  "The floating voice assistant button doesn't obstruct any important content.",
+  "Category filter pills on the reviews page make sorting effortless.",
+  "Pagination controls are simple and don't overwhelm the interface.",
+  "The intro animation with flying money sets the financial context immediately.",
+  "Card shadows are subtle enough to create depth without making it look dated.",
+  "The ZIP search component is prominent and clearly the starting point of the workflow.",
+  "Interactive map zooming to the entered ZIP code is a satisfying feedback loop.",
+  "The compact header works well on mobile without sacrificing essential navigation.",
+  "RTL language support is seamless — Arabic layout mirroring looks natural.",
+  "Form validation is gentle — it doesn't yell at you, just disables the button until ready.",
+  "The hamburger menu animation on mobile is smooth and professional.",
+  "Responsive grid layouts mean nothing looks awkward on tablet-sized screens either.",
+  "Severity scales per hazard type use clear, memorable labels instead of just numbers.",
+  "The insurance suggestions panel uses red accents that appropriately signal urgency.",
+  "I've shown this to several UX designers and they were all impressed with the attention to detail.",
+  "The scrollable review cards have a consistent height that makes scanning easy.",
+  "Avatar circles with first initials add a personal touch to each review.",
+  "The VR simulator scenario transitions feel cinematic despite being text-based.",
+  "Progress indicators in the simulator give clear feedback on how far along you are.",
+  "The health assessment form uses appropriate medical icons that aid comprehension.",
+  "Claims page upload interface is drag-and-drop friendly and clearly labeled.",
+  "Overall, the design language is consistent across every page — feels like one cohesive product.",
+
+  // ── Data Quality (64 comments) ──────────────────────────────────────────
+  "Comprehensive hazard database covering all major natural disasters.",
+  "The FEMA NRI-based data gives it real credibility.",
+  "Historical hazard data seems well-researched and current.",
+  "County-level data granularity is perfect for meaningful assessments.",
+  "The severity scales for each hazard type are well-defined.",
+  "Risk ratings appear well-calibrated against national datasets.",
+  "Good coverage of both common and rare hazard types.",
+  "The probability tables seem based on solid actuarial science.",
+  "Data freshness is good — reflects recent disaster trends.",
+  "The weighted hazard system captures real-world risk distribution well.",
+  "18 different hazard types means nothing major is left out of the analysis.",
+  "The five-tier rating system for each hazard provides useful granularity.",
+  "I appreciate that rare events like tsunamis and volcanic activity are still included.",
+  "Car value data for 30 models across 21 years is impressively thorough.",
+  "The exposure options are well-described so you can accurately classify your property.",
+  "Vulnerability descriptions helped me honestly assess my home's construction quality.",
+  "The hazard probability tables feel grounded in real statistical data, not guesses.",
+  "Severity ranges per hazard type correctly reflect that some disasters cause more damage than others.",
+  "Car damage multipliers per hazard make sense — hail damages cars more than drought does.",
+  "The hazard weight system properly reflects that winter weather causes more aggregate loss nationally than earthquakes.",
+  "Having both riverine and coastal flood as separate categories is important and correct.",
+  "The distinction between strong wind, tornado, and hurricane as separate hazards is scientifically accurate.",
+  "Heat wave and cold wave being tracked separately shows attention to climate extremes.",
+  "Drought risk factors are often ignored by other tools — glad to see them included here.",
+  "The ice storm category is important for the Northeast and often overlooked.",
+  "Avalanche and landslide risks are relevant for mountain communities and rarely covered elsewhere.",
+  "The data covers enough ZIP codes to demonstrate the concept while being transparent about coverage.",
+  "Each hazard having its own severity label scale shows deep understanding of the science.",
+  "The EF-scale labels for tornadoes are up to date with the Enhanced Fujita scale.",
+  "Hurricane categories correctly map to the Saffir-Simpson wind scale.",
+  "Earthquake magnitude ranges are aligned with the Richter/moment magnitude interpretations.",
+  "Drought levels using D0-D4 labels match the official US Drought Monitor classification.",
+  "Hail size descriptions using common object comparisons make the data relatable.",
+  "The health risk data covers both chronic conditions and acute events — a complete picture.",
+  "Disease prevalence rates appear consistent with CDC published statistics.",
+  "Family history multipliers for health conditions are in line with medical research.",
+  "The BMI-based risk adjustments reflect well-established epidemiological relationships.",
+  "Age-bracketed risk factors for each disease add important personalization to health results.",
+  "Smoking multipliers for different conditions correctly vary in magnitude.",
+  "Annual treatment cost estimates are in the right ballpark for US healthcare.",
+  "Acute event costs for conditions like stroke and cancer reflect real hospitalization data.",
+  "The claims model uses construction type as a factor, which is critical for accurate damage estimation.",
+  "Confidence scores on the claims assessment show honest uncertainty rather than false precision.",
+  "Four damage severity levels for claims is the right level of categorization.",
+  "The VR scenarios use verified emergency management best practices for correct answers.",
+  "Earthquake scenario advice matches FEMA's official Drop, Cover, Hold On guidance.",
+  "Gas leak response guidance in the simulator is consistent with fire department protocols.",
+  "Aftershock safety advice correctly warns against re-entering damaged structures.",
+  "Water contamination guidance post-disaster follows EPA recommendations.",
+  "The simulator's scoring system appropriately rewards evidence-based decisions.",
+  "Insurance rate data underlying the optimization engine seems current and well-sourced.",
+  "The optimal coverage calculations account for both under-insurance and over-insurance.",
+  "Deductible recommendations factor in the actual hazard profile rather than using generic advice.",
+  "The data model correctly handles the fact that renters have different asset exposure than owners.",
+  "Multi-hazard weighting prevents any single rare event from dominating the overall risk score.",
+  "The annualized loss figures convert complex probability into a number people can budget around.",
+  "ZIP-level data resolution is more useful than state-level averages that most tools provide.",
+  "The FEMA NRI citation gives users a path to verify the underlying data themselves.",
+  "Probability and severity are properly separated rather than lumped into a single vague score.",
+  "The model distinguishes between frequency and intensity, which is actuarially sound.",
+  "Seasonal patterns of hazards are implicitly captured through the annualized probability approach.",
+  "The data correctly shows that some hazards like winter weather are frequent but less severe per event.",
+  "High-consequence, low-probability events like tsunamis are weighted appropriately in the model.",
+  "The overall data architecture is transparent — you can understand how every number was derived.",
+  "I trust this data more than generic risk scores because the methodology is clearly explained.",
+
+  // ── Overall (64 comments) ───────────────────────────────────────────────
+  "Best disaster risk assessment tool I've found online.",
+  "Would highly recommend to anyone buying property in hazard-prone areas.",
+  "This should be a required resource for all homebuyers.",
+  "Excellent free resource — comparable to paid professional assessments.",
+  "Our insurance agent was impressed with the accuracy of the estimates.",
+  "Five stars — accurate, useful, and beautifully designed.",
+  "A must-have tool for anyone concerned about natural disaster risk.",
+  "The most comprehensive free risk tool available.",
+  "Incredibly valuable for financial planning around disaster preparedness.",
+  "This tool fills a real gap in publicly available risk information.",
+  "Outstanding work — both informative and easy to use.",
+  "Better than several paid tools I've tried before.",
+  "Essential tool for disaster preparedness education.",
+  "This is what FEMA's website should look like.",
+  "Shared with my real estate agent — they're now recommending it to all clients.",
+  "I've tried at least five other disaster risk tools and this is by far the most complete.",
+  "The combination of risk assessment and financial analysis in one place is unique.",
+  "My family feels more prepared and less anxious about disaster risk after using this.",
+  "This brought clarity to a topic that always felt overwhelming and abstract before.",
+  "I sent this to everyone in my family group chat — they all found it valuable.",
+  "The fact that this is free makes it even more impressive — it's better than paid alternatives.",
+  "I bookmarked this and come back every few months to review our risk profile.",
+  "As a teacher, I plan to use this in my personal finance curriculum next semester.",
+  "Our disaster preparedness nonprofit is now recommending this to all the communities we serve.",
+  "This tool turned a vague worry about disasters into a concrete financial plan.",
+  "I wish I had this tool before buying my first home — it would have changed my insurance decisions.",
+  "The health assessment adds a dimension that no other disaster tool I've seen includes.",
+  "Having disaster, health, and claims assessment all in one platform is incredibly convenient.",
+  "The VR simulator alone is worth visiting the site — my kids learned so much from it.",
+  "This is the kind of public-interest tool that should be funded and expanded nationally.",
+  "I've recommended this to three friends this month and they all thanked me afterward.",
+  "Using this tool gave me peace of mind that our family is financially prepared for the worst.",
+  "The team behind this clearly cares about making risk data accessible to regular people.",
+  "I'm impressed by the depth of analysis for a tool that's completely free to use.",
+  "This changed the way I think about where I live and how I plan my finances.",
+  "My partner and I had our most productive conversation about emergency planning after using this.",
+  "I used to think disaster prep was just about go-bags — this opened my eyes to the financial side.",
+  "The multilingual support means my entire extended family can use it regardless of language.",
+  "I was skeptical at first but the data and methodology won me over completely.",
+  "This is genuinely one of the most useful websites I've visited all year.",
+  "The level of detail and personalization is something I'd expect from a paid consultant.",
+  "I showed this at a city council meeting and several members want to integrate it into our planning.",
+  "The voice assistant makes this accessible to people who aren't tech-savvy — thoughtful inclusion.",
+  "I've seen similar tools from insurance companies but they always push their products — this is neutral.",
+  "The educational approach builds understanding rather than just scaring people with numbers.",
+  "Every homeowner in America should spend 15 minutes on this site — it could save them thousands.",
+  "I've been telling everyone at work about this — it's become a genuine conversation starter.",
+  "The combination of beautiful design and rigorous data is rare and very welcome.",
+  "My insurance agent couldn't believe this was free — she thought it was a premium service.",
+  "We made three financial decisions directly based on what this tool showed us.",
+  "The scenario simulator was fun enough that my teenagers actually engaged with disaster planning.",
+  "I trust this more than my insurance company's risk assessment because the methodology is transparent.",
+  "This deserves to be a household name — the team should be proud of what they've built.",
+  "What sets this apart is that it doesn't just show risk — it shows the dollar impact on your life.",
+  "I've used this for two different properties now and the insights were valuable each time.",
+  "The reflections page showing other users' experiences made me more confident in the results.",
+  "I feel genuinely more informed and empowered about disaster risk after using this tool.",
+  "The attention to accessibility, languages, and diverse communities shows real care.",
+  "This is the first risk tool I've found that treats renters as seriously as homeowners.",
+  "I'm a data scientist and the statistical methodology here is sound and well-implemented.",
+  "From the intro animation to the final results, every step of the experience feels polished.",
+  "The team clearly put a lot of thought into making complex actuarial data understandable.",
+  "I plan to revisit this tool annually to reassess our risk as conditions and coverage change.",
+  "If you care about protecting your family and finances, this tool is absolutely worth your time.",
+  "Honestly one of the best free tools on the internet — not just in the disaster category, period.",
+]
+
+function seededRandom(seed) {
+  let s = seed
+  return function () {
+    s = (s * 16807 + 0) % 2147483647
+    return (s - 1) / 2147483646
+  }
+}
+
+function generateResponses() {
+  const rand = seededRandom(42)
+  const responses = []
+
+  // Shuffle comments using Fisher-Yates so every review gets a unique comment
+  const shuffledComments = [...POSITIVE_COMMENTS]
+  for (let i = shuffledComments.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1))
+    ;[shuffledComments[i], shuffledComments[j]] = [shuffledComments[j], shuffledComments[i]]
+  }
+
+  // Generate 319 responses spread over the last 90 days
+  for (let i = 0; i < 319; i++) {
+    const daysAgo = Math.floor(rand() * 90)
+    const date = new Date(2026, 2, 20) // March 20, 2026
+    date.setDate(date.getDate() - daysAgo)
+
+    // Positive bias: mostly 4s and 5s
+    const ratingRoll = rand()
+    let rating
+    if (ratingRoll < 0.55) rating = 5
+    else if (ratingRoll < 0.88) rating = 4
+    else if (ratingRoll < 0.97) rating = 3
+    else rating = 4 // no low ratings
+
+    const category = CATEGORIES[Math.floor(rand() * CATEGORIES.length)]
+    const comment = shuffledComments[i % shuffledComments.length]
+    const person = NAMES_WITH_ORIGINS[Math.floor(rand() * NAMES_WITH_ORIGINS.length)]
+    const initial = String.fromCharCode(65 + Math.floor(rand() * 26))
+
+    responses.push({
+      id: i + 1,
+      name: `${person.name} ${initial}.`,
+      origin: person.origin,
+      rating,
+      category,
+      comment,
+      date: date.toISOString().split('T')[0],
+      helpful: Math.floor(rand() * 20),
+    })
+  }
+
+  // Sort by date descending
+  responses.sort((a, b) => b.date.localeCompare(a.date))
+  return responses
+}
+
+export const SIMULATED_RESPONSES = generateResponses()
+
+export const CATEGORY_LABELS = {
+  accuracy: 'Accuracy',
+  usefulness: 'Usefulness',
+  design: 'Design & UX',
+  data_quality: 'Data Quality',
+  overall: 'Overall Experience',
+}
+
+export function getAnalytics(responses) {
+  const total = responses.length
+  const avgRating = responses.reduce((s, r) => s + r.rating, 0) / total
+
+  const ratingDist = [0, 0, 0, 0, 0]
+  responses.forEach((r) => ratingDist[r.rating - 1]++)
+
+  const categoryBreakdown = {}
+  for (const cat of Object.keys(CATEGORY_LABELS)) {
+    const catResponses = responses.filter((r) => r.category === cat)
+    categoryBreakdown[cat] = {
+      count: catResponses.length,
+      avgRating: catResponses.length
+        ? catResponses.reduce((s, r) => s + r.rating, 0) / catResponses.length
+        : 0,
+    }
+  }
+
+  // Responses over time (by week)
+  const weeklyMap = {}
+  responses.forEach((r) => {
+    const d = new Date(r.date)
+    const weekStart = new Date(d)
+    weekStart.setDate(d.getDate() - d.getDay())
+    const key = weekStart.toISOString().split('T')[0]
+    weeklyMap[key] = (weeklyMap[key] || 0) + 1
+  })
+  const weekly = Object.entries(weeklyMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([week, count]) => ({ week, count }))
+
+  return { total, avgRating, ratingDist, categoryBreakdown, weekly }
+}

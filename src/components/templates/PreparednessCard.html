@@ -1,0 +1,42 @@
+<div class="dg-card dg-preparedness-card">
+    <div class="dg-card-header">
+        <span class="dg-card-icon danger">⚠️</span>
+        <h3 class="dg-card-title">{{app.gapCard.title}}</h3>
+    </div>
+
+    <div class="dg-stat-grid">
+        <div class="dg-stat-box danger">
+            <span class="dg-stat-number">$45K</span>
+            <span class="dg-stat-label">{{app.gapCard.label1}}</span>
+        </div>
+        <div class="dg-stat-box success">
+            <span class="dg-stat-number">$8.9K</span>
+            <span class="dg-stat-label">{{app.gapCard.label2}}</span>
+        </div>
+        <div class="dg-stat-box warning">
+            <span class="dg-stat-number">36%</span>
+            <span class="dg-stat-label">{{app.gapCard.label3}}</span>
+        </div>
+        <div class="dg-stat-box info">
+            <span class="dg-stat-number">$3.5K</span>
+            <span class="dg-stat-label">{{app.gapCard.label4}}</span>
+        </div>
+    </div>
+
+    <div class="dg-gap-bar-section">
+        <p class="dg-gap-bar-label">{{app.gapCard.barLabel}}</p>
+        <div class="dg-gap-bar">
+            <div class="dg-gap-filled">20%</div>
+            <div class="dg-gap-empty">— 80% gap —</div>
+        </div>
+    </div>
+
+    <div class="dg-card-note">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2c6.627 0 12 5.373 12 12s-5.373 12-12 12S0 20.627 0 14 5.373 2 12 2z"></path>
+            <circle cx="12" cy="17" r="1"></circle>
+            <path d="M12 5v7"></path>
+        </svg>
+        <p>{{app.gapCard.note}}</p>
+    </div>
+</div>

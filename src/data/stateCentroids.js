@@ -1,0 +1,61 @@
+/**
+ * Geographic centroids and metadata for all 50 US states.
+ * Coordinates are approximate state centers used for FEMA NRI regional lookups.
+ */
+export const STATE_CENTROIDS = [
+  { abbr: 'AL', name: 'Alabama',        lat: 32.7794,  lng: -86.8287 },
+  { abbr: 'AK', name: 'Alaska',         lat: 64.2008,  lng: -153.4937 },
+  { abbr: 'AZ', name: 'Arizona',        lat: 34.2744,  lng: -111.6602 },
+  { abbr: 'AR', name: 'Arkansas',       lat: 34.8938,  lng: -92.4426 },
+  { abbr: 'CA', name: 'California',     lat: 37.1841,  lng: -119.4696 },
+  { abbr: 'CO', name: 'Colorado',       lat: 38.9972,  lng: -105.5478 },
+  { abbr: 'CT', name: 'Connecticut',    lat: 41.6219,  lng: -72.7273 },
+  { abbr: 'DE', name: 'Delaware',       lat: 38.9896,  lng: -75.5050 },
+  { abbr: 'FL', name: 'Florida',        lat: 28.6305,  lng: -82.4497 },
+  { abbr: 'GA', name: 'Georgia',        lat: 32.6415,  lng: -83.4426 },
+  { abbr: 'HI', name: 'Hawaii',         lat: 20.2927,  lng: -156.3737 },
+  { abbr: 'ID', name: 'Idaho',          lat: 44.3509,  lng: -114.6130 },
+  { abbr: 'IL', name: 'Illinois',       lat: 40.0417,  lng: -89.1965 },
+  { abbr: 'IN', name: 'Indiana',        lat: 39.8942,  lng: -86.2816 },
+  { abbr: 'IA', name: 'Iowa',           lat: 42.0751,  lng: -93.4960 },
+  { abbr: 'KS', name: 'Kansas',         lat: 38.4937,  lng: -98.3804 },
+  { abbr: 'KY', name: 'Kentucky',       lat: 37.5347,  lng: -85.3021 },
+  { abbr: 'LA', name: 'Louisiana',      lat: 31.0689,  lng: -91.9968 },
+  { abbr: 'ME', name: 'Maine',          lat: 45.3695,  lng: -69.2428 },
+  { abbr: 'MD', name: 'Maryland',       lat: 39.0550,  lng: -76.7909 },
+  { abbr: 'MA', name: 'Massachusetts',  lat: 42.2596,  lng: -71.8083 },
+  { abbr: 'MI', name: 'Michigan',       lat: 44.3467,  lng: -85.4102 },
+  { abbr: 'MN', name: 'Minnesota',      lat: 46.2807,  lng: -94.3053 },
+  { abbr: 'MS', name: 'Mississippi',    lat: 32.7364,  lng: -89.6678 },
+  { abbr: 'MO', name: 'Missouri',       lat: 38.3566,  lng: -92.4580 },
+  { abbr: 'MT', name: 'Montana',        lat: 47.0527,  lng: -109.6333 },
+  { abbr: 'NE', name: 'Nebraska',       lat: 41.5378,  lng: -99.7951 },
+  { abbr: 'NV', name: 'Nevada',         lat: 39.3289,  lng: -116.6312 },
+  { abbr: 'NH', name: 'New Hampshire',  lat: 43.6805,  lng: -71.5811 },
+  { abbr: 'NJ', name: 'New Jersey',     lat: 40.1907,  lng: -74.6728 },
+  { abbr: 'NM', name: 'New Mexico',     lat: 34.4071,  lng: -106.1126 },
+  { abbr: 'NY', name: 'New York',       lat: 42.9538,  lng: -75.5268 },
+  { abbr: 'NC', name: 'North Carolina', lat: 35.5557,  lng: -79.3877 },
+  { abbr: 'ND', name: 'North Dakota',   lat: 47.4501,  lng: -100.4659 },
+  { abbr: 'OH', name: 'Ohio',           lat: 40.2862,  lng: -82.7937 },
+  { abbr: 'OK', name: 'Oklahoma',       lat: 35.5889,  lng: -97.4943 },
+  { abbr: 'OR', name: 'Oregon',         lat: 43.9336,  lng: -120.5583 },
+  { abbr: 'PA', name: 'Pennsylvania',   lat: 40.8781,  lng: -77.7996 },
+  { abbr: 'RI', name: 'Rhode Island',   lat: 41.6762,  lng: -71.5562 },
+  { abbr: 'SC', name: 'South Carolina', lat: 33.9169,  lng: -80.8964 },
+  { abbr: 'SD', name: 'South Dakota',   lat: 44.4443,  lng: -100.2263 },
+  { abbr: 'TN', name: 'Tennessee',      lat: 35.8580,  lng: -86.3505 },
+  { abbr: 'TX', name: 'Texas',          lat: 31.4757,  lng: -99.3312 },
+  { abbr: 'UT', name: 'Utah',           lat: 39.3210,  lng: -111.0937 },
+  { abbr: 'VT', name: 'Vermont',        lat: 44.0687,  lng: -72.6658 },
+  { abbr: 'VA', name: 'Virginia',       lat: 37.5215,  lng: -78.8537 },
+  { abbr: 'WA', name: 'Washington',     lat: 47.3826,  lng: -120.4472 },
+  { abbr: 'WV', name: 'West Virginia',  lat: 38.6409,  lng: -80.6227 },
+  { abbr: 'WI', name: 'Wisconsin',      lat: 44.6243,  lng: -89.9941 },
+  { abbr: 'WY', name: 'Wyoming',        lat: 42.9957,  lng: -107.5512 },
+]
+
+/** Quick lookup by state abbreviation */
+export function getStateCentroid(abbr) {
+  return STATE_CENTROIDS.find((s) => s.abbr === abbr.toUpperCase()) ?? null
+}
